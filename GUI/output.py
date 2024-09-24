@@ -1,7 +1,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 import style
 import preferences
-
+isRecRunning=False
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -35,6 +35,7 @@ class Ui_MainWindow(object):
         self.pushButton.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
         self.pushButton.setStyleSheet(style.button())
         self.pushButton.setObjectName("pushButton")
+        self.pushButton.clicked.connect(self.startRecognition)
         self.horizontalLayout.addWidget(self.pushButton)
 
         self.pushButton_2 = QtWidgets.QPushButton(parent=self.navButtonsWidget)
@@ -84,7 +85,16 @@ class Ui_MainWindow(object):
 
     def openSettings(self):
         self.settingsWindow.show()
-
+    def startRecognition(self):
+        global isRecRunning
+        #itt kéne a mozdulatok felismerésének kezdődnie
+        if isRecRunning:
+            self.pushButton.setText("Használat")
+            isRecRunning=False
+        else:
+            self.pushButton.setText("Megállítás")
+            isRecRunning=True
+        
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "GestureMaster"))
@@ -192,6 +202,7 @@ class Ui_settingsWindow(object):
        
         self.label_3 = QtWidgets.QLabel(parent=self.gridLayoutWidget_2)
         self.label_3.setObjectName("label_3")
+        
         self.gridLayout_2.addWidget(self.label_3, 0, 0, 1, 2)
         
         self.label_5 = QtWidgets.QLabel(parent=self.gridLayoutWidget_2)

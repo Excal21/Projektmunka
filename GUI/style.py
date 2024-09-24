@@ -5,10 +5,10 @@ def  mainWindowStyle():
    return "background-color: #22092C; color: white; font: 20pt \"Bahnschrift\";"
 
 def projectDescription():
-   return "picsa"
+   return "asd"
 
 def contacts(): 
-   return "fasz"
+   return "asd"
 def dropDownMenu():
     return """
     QComboBox {
@@ -29,10 +29,10 @@ def dropDownMenu():
 def hasbara():
     return "hasbara"
 def thumbsUp():
-    return '<html><head/><body><p>Thumbs Up<br/><img src="thumbsup.png"/></p></body></html>'
+    return '<html><head/><body><p>Thumbs Up<br/><span style="font-size:14pt;">hüvelykujj mutatása<br>felfelé</span></p></body></html>'
 def thumbsDown():
-   return '<html><head/><body><p>Thumbs Down<br/><img src="thumbsdonw.png"/></p></body></html>'
+   return '<html><head/><body><p>Thumbs Down<br/><span style="font-size:14pt;">hüvelykujj mutatása<br>lefelé</span></p></body></html>'
 def pointingUp():
-    return '<html><head/><body><p>Pointing Up<br/><img src=""/></p></body></html>'
+    return '<html><head/><body><p>Pointing Up<br/><span style="font-size:14pt;">mutatóujj mutatása<br>felfelé</span></p></body></html>'
 def victory():
-   return '<html><head/><body><p>Victory<br/><img src=""/></p></body></html>'
+   return '<html><head/><body><p>Victory<br/><span style="font-size:14pt;">győzelmi jel<br>mutatása<br>mutató és<br>középső ujjakkal</span></p></body></html>'

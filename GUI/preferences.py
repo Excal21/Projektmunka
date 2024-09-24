@@ -32,5 +32,3 @@ def create_preferences(settings):
     # Convert prefs dictionary to JSON and save to file
     with open('preferences.json', 'w', encoding='utf-8') as json_file:
         json.dump(prefs, json_file, ensure_ascii=False, indent=4)
-
-    print(prefs)
