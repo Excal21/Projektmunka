@@ -74,19 +74,19 @@ options = vision.GestureRecognizerOptions(
 
 recognizer = vision.GestureRecognizer.create_from_options(options)
 
-url = "http://192.168.1.12:8080/shot.jpg" #Telefon kamera
-#cap = cv2.VideoCapture(0)    #Beépített kamera
+url = "http://192.168.193.124:8080/shot.jpg" #Telefon kamera
+cap = cv2.VideoCapture(0)    #Beépített kamera
 
 while True: 
     #Beépített kamera
-    #ret, img = cap.read()
-    #img = cv2.flip(img, 1)
+    ret, img = cap.read()
+    img = cv2.flip(img, 1)
 
 
     #Telefon kamera
-    img_resp = requests.get(url)
-    img_arr = np.array(bytearray(img_resp.content), dtype=np.uint8)
-    img = cv2.imdecode(img_arr, -1)
+    # img_resp = requests.get(url)
+    # img_arr = np.array(bytearray(img_resp.content), dtype=np.uint8)
+    # img = cv2.imdecode(img_arr, -1)
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     
     
@@ -104,9 +104,9 @@ while True:
     elif len(result.gestures) == 2 and result.gestures[0][0].category_name != 'None' and result.gestures[1][0].category_name != 'None':
         print('Bal kéz: ' + ' ' + result.gestures[0][0].category_name + ' ' +
               'Jobb kéz: ' + ' ' + result.gestures[1][0].category_name)
-        sleep(0.01)
     
-
+    #sleep(0.01)
+    
 
     annotated_image = draw_landmarks_on_image(mp_image.numpy_view(), result)
 
