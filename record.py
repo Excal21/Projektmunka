@@ -2,13 +2,16 @@ import cv2
 import os
 
 # Mappa létrehozása, ha nem létezik
-output_dir = "F"
+output_dir = "GESZTUS_NEVE"
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
 # Kamera inicializálása
 url = "http://192.168.193.124:8080/video"
 cap = cv2.VideoCapture(0)
+
+width = 500
+height = 500
 
 img_counter = 0
 
@@ -19,11 +22,11 @@ while True:
         break
 
     # Kép közepének kivágása (320x240 pixel)
-    height, width, _ = frame.shape
-    start_x = width // 2 - 160
-    start_y = height // 2 - 120
-    end_x = start_x + 500
-    end_y = start_y + 500
+    y, x, _ = frame.shape
+    start_x = x // 2 - 160
+    start_y = y // 2 - 120
+    end_x = start_x + width
+    end_y = start_y + height
     cropped_frame = frame[start_y:end_y, start_x:end_x]
 
     cv2.imshow("Kamera", cropped_frame)
