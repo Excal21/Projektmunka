@@ -1,8 +1,8 @@
 def  button():
-   return "height: 45px;border-radius: 10px; border: none; background-color: #872341;"
+   return "height: 45px;border-radius: 10px; border: none; background-color: #385b7d;"
 
 def  mainWindowStyle():
-   return "background-color: #22092C; color: white; font: 20pt \"Bahnschrift\";"
+   return "background-color: #151b23; color: white; font: 20pt \"Bahnschrift\";"
 
 def projectDescription():
    return "asd"
@@ -13,7 +13,7 @@ def dropDownMenu():
     return """
     QComboBox {
         font-size: 12pt;
-        background-color: #872341;
+        background-color: #385b7d;
         border-radius: 5px;
         height: 30px;
     }
