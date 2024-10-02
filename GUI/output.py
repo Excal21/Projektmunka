@@ -1,7 +1,15 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
+import sys
 import style
 import preferences
-isRecRunning=False
+import json
+import webbrowser
+
+selected_prefs = []
+possible_commands = ["Ctrl+C", "Ctrl+V", "Böngésző megnyitása", "fényerő növelése", "fényerő csökkentése"]
+usedJsonFile = ""
+usedTaskFile = ""
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -35,8 +43,8 @@ class Ui_MainWindow(object):
         self.pushButton.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
         self.pushButton.setStyleSheet(style.button())
         self.pushButton.setObjectName("pushButton")
-        self.pushButton.clicked.connect(self.startRecognition)
         self.horizontalLayout.addWidget(self.pushButton)
+        self.pushButton.clicked.connect(self.startRecognition)
 
         self.pushButton_2 = QtWidgets.QPushButton(parent=self.navButtonsWidget)
         self.pushButton_2.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
@@ -44,7 +52,7 @@ class Ui_MainWindow(object):
         self.pushButton_2.setObjectName("pushButton_2")
         self.pushButton_2.clicked.connect(self.openSettings)
         self.horizontalLayout.addWidget(self.pushButton_2)
-
+        
         # Label
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(260, 30, 281, 81))
@@ -83,18 +91,33 @@ class Ui_MainWindow(object):
         self.ui_settings = Ui_settingsWindow()
         self.ui_settings.setupUi(self.settingsWindow)
 
+    
+    def startRecognition(self):
+        try:
+            with open('preferences.json', 'r', encoding='utf-8') as file:
+                data = json.load(file)
+                if data and usedJsonFile != "":  # Check if data is not empty
+                    print("sandor_pipas_kepe.png")
+                    print("itt nincs semmi, de ezt a Ricsi nem tudja")
+                    print("hasznalt .task fajl: ", usedTaskFile)
+                    
+                    if self.pushButton.text() == "Használat":
+                        self.pushButton.setText("megállítás")  # Change button text to "megállítás"
+                        self.pushButton_2.setEnabled(False)  # Disable pushButton_2
+                    else:
+                        self.pushButton.setText("Használat")  # Change button text back to "Használat"
+                        self.pushButton_2.setEnabled(True)  # Enable pushButton_2
+        except Exception as e:
+            message = QtWidgets.QMessageBox()
+            message.setWindowTitle("Hiba")
+            message.setText("Nincs kiválasztott fájl!")
+            message.setIcon(QtWidgets.QMessageBox.Icon.Warning)
+            message.exec()
+            return
+        
     def openSettings(self):
         self.settingsWindow.show()
-    def startRecognition(self):
-        global isRecRunning
-        #itt kéne a mozdulatok felismerésének kezdődnie
-        if isRecRunning:
-            self.pushButton.setText("Használat")
-            isRecRunning=False
-        else:
-            self.pushButton.setText("Megállítás")
-            isRecRunning=True
-        
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "GestureMaster"))
@@ -103,172 +126,200 @@ class Ui_MainWindow(object):
         self.label.setText(_translate("MainWindow", "GestureMaster"))
         self.label_3.setText(_translate("MainWindow", style.projectDescription()))
         self.label_2.setText(_translate("MainWindow", style.contacts()))
+        open('preferences.json', 'w').close()
 
 class Ui_settingsWindow(object):
     def setupUi(self, settingsWindow):
         settingsWindow.setObjectName("settingsWindow")
         settingsWindow.resize(900, 700)
+        settingsWindow.setStyleSheet(style.mainWindowStyle())
+
+        # Central widget
         self.centralwidget = QtWidgets.QWidget(parent=settingsWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.centralwidget.setStyleSheet(style.mainWindowStyle())
-        
+
+        # Horizontal Layout Widget for Label and Button
         self.horizontalLayoutWidget = QtWidgets.QWidget(parent=self.centralwidget)
         self.horizontalLayoutWidget.setGeometry(QtCore.QRect(30, 10, 731, 80))
         self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
+
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
-       
+
+        # Label
         self.label = QtWidgets.QLabel(parent=self.horizontalLayoutWidget)
         self.label.setObjectName("label")
         self.horizontalLayout.addWidget(self.label, 0, QtCore.Qt.AlignmentFlag.AlignHCenter)
-        
-        self.label_2 = QtWidgets.QLabel(parent=self.horizontalLayoutWidget)
-        self.label_2.setObjectName("label_2")
-        self.horizontalLayout.addWidget(self.label_2, 0, QtCore.Qt.AlignmentFlag.AlignHCenter|QtCore.Qt.AlignmentFlag.AlignVCenter)
-        
-        self.gridLayoutWidget = QtWidgets.QWidget(parent=self.centralwidget)
-        self.gridLayoutWidget.setGeometry(QtCore.QRect(450, 130, 400,500))
-        self.gridLayoutWidget.setObjectName("gridLayoutWidget")
-        self.gridLayout = QtWidgets.QGridLayout(self.gridLayoutWidget)
-        self.gridLayout.setContentsMargins(0, 0, 0, 0)
-        self.gridLayout.setObjectName("gridLayout")
-        
-        self.thumbsDown = QtWidgets.QComboBox(parent=self.gridLayoutWidget)
-        self.thumbsDown.setObjectName("thumbsDown")
-        self.thumbsDown.addItems(["Thumbs down", "Ctrl+C", "Ctrl+V", "Fényerő növelése", "Fényerő csökkentése", "Böngésző megnyitása"])
-        self.thumbsDown.model().item(0).setEnabled(False)
-        self.thumbsDown.setStyleSheet(style.dropDownMenu())
-        self.gridLayout.addWidget(self.thumbsDown, 1, 0, 1, 1)
-        
-        self.victory = QtWidgets.QComboBox(parent=self.gridLayoutWidget)
-        self.victory.setObjectName("victory")
-        self.victory.addItems(["Victory", "Ctrl+C", "Ctrl+V", "Fényerő növelése", "Fényerő csökkentése", "Böngésző megnyitása"])
-        self.victory.model().item(0).setEnabled(False)
-        self.victory.setStyleSheet(style.dropDownMenu())
-        self.gridLayout.addWidget(self.victory, 0, 1, 1, 1)
-        
-        self.pointingUp = QtWidgets.QComboBox(parent=self.gridLayoutWidget)
-        self.pointingUp.setObjectName("pointingUp")
-        self.pointingUp.addItems(["Pointing up", "Ctrl+C", "Ctrl+V", "Fényerő növelése", "Fényerő csökkentése", "Böngésző megnyitása"],)
-        self.pointingUp.model().item(0).setEnabled(False)
-        self.pointingUp.setStyleSheet(style.dropDownMenu())
-        self.gridLayout.addWidget(self.pointingUp, 1, 1, 1, 1)
-        
-        self.thumbsUp = QtWidgets.QComboBox(parent=self.gridLayoutWidget)
-        self.thumbsUp.setObjectName("thumbsUp")
-        self.thumbsUp.addItems(["Thumbs up", "Ctrl+C", "Ctrl+V", "Fényerő növelése", "Fényerő csökkentése", "Böngésző megnyitása"])
-        self.thumbsUp.model().item(0).setEnabled(False)
-        self.thumbsUp.setStyleSheet(style.dropDownMenu())
-        self.gridLayout.addWidget(self.thumbsUp, 0, 0, 1, 1)
-        
-        self.inputSourceLabel = QtWidgets.QLabel(parent=self.gridLayoutWidget)
-        self.inputSourceLabel.setObjectName("inputSourceLabel")
-        self.inputSourceLabel.setStyleSheet("max-height: 30px;")
-        self.gridLayout.addWidget(self.inputSourceLabel, 2, 0, 1, 2, QtCore.Qt.AlignmentFlag.AlignHCenter)
 
-        # Connect signals to the slot to ensure unique selections
-        self.thumbsDown.currentIndexChanged.connect(self.updateComboBoxes)
-        self.victory.currentIndexChanged.connect(self.updateComboBoxes)
-        self.pointingUp.currentIndexChanged.connect(self.updateComboBoxes)
-        self.thumbsUp.currentIndexChanged.connect(self.updateComboBoxes)
+        # Button to open File Dialog
+        self.fileDialogButton = QtWidgets.QPushButton(self.horizontalLayoutWidget)
+        self.fileDialogButton.setObjectName("fileDialogButton")
+        self.fileDialogButton.setText("tallózás")
+        self.fileDialogButton.setStyleSheet(style.button())
+        self.fileDialogButton.clicked.connect(self.openFileDialog)
+        self.horizontalLayout.addWidget(self.fileDialogButton, 0, QtCore.Qt.AlignmentFlag.AlignHCenter)
 
-        self.inputSource = QtWidgets.QComboBox(parent=self.gridLayoutWidget)
-        self.inputSource.setObjectName("inputSource")
-        self.inputSource.addItems(["eszköz kamerája", "telefon kamerája"])
-        self.inputSource.setStyleSheet(style.dropDownMenu())
-        self.gridLayout.addWidget(self.inputSource, 3, 0, 1, 2)
+        # Main content layout
+        self.mainContentWidget = QtWidgets.QWidget(self.centralwidget)
+        self.mainContentWidget.setGeometry(QtCore.QRect(30, 100, 840, 500))
+        self.mainContentWidget.setObjectName("mainContentWidget")
 
-        self.saveSettings = QtWidgets.QPushButton(parent=self.gridLayoutWidget)
-        self.saveSettings.setObjectName("saveSettings")
-        self.saveSettings.setStyleSheet(style.button())
-        self.saveSettings.clicked.connect(self.savePreferences)  # Pass the method reference without parentheses
-        self.gridLayout.addWidget(self.saveSettings, 4, 0, 1, 2)
-        
-        self.gridLayout.setRowStretch(0, 1)
-        self.gridLayout.setRowStretch(1, 1)
-        self.gridLayout.setRowStretch(2, 1)
-        self.gridLayout.setRowStretch(3, 1)
-        self.gridLayout.setRowStretch(4, 1)
-        self.gridLayout.setColumnStretch(0, 1)
-        self.gridLayout.setColumnStretch(1, 1)
+        self.mainContentLayout = QtWidgets.QHBoxLayout(self.mainContentWidget)
+        self.mainContentLayout.setObjectName("mainContentLayout")
 
-        self.gridLayoutWidget_2 = QtWidgets.QWidget(parent=self.centralwidget)
-        self.gridLayoutWidget_2.setGeometry(QtCore.QRect(30, 130, 371, 471))
-        self.gridLayoutWidget_2.setObjectName("gridLayoutWidget_2")
-        self.gridLayout_2 = QtWidgets.QGridLayout(self.gridLayoutWidget_2)
-        self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.gridLayout_2.setObjectName("gridLayout_2")
-       
-        self.label_3 = QtWidgets.QLabel(parent=self.gridLayoutWidget_2)
-        self.label_3.setObjectName("label_3")
-        
-        self.gridLayout_2.addWidget(self.label_3, 0, 0, 1, 2)
-        
-        self.label_5 = QtWidgets.QLabel(parent=self.gridLayoutWidget_2)
-        self.label_5.setObjectName("label_5")
-        self.gridLayout_2.addWidget(self.label_5, 1, 1, 1, 1, QtCore.Qt.AlignmentFlag.AlignHCenter)
-        
-        self.label_4 = QtWidgets.QLabel(parent=self.gridLayoutWidget_2)
-        self.label_4.setObjectName("label_4")
-        self.gridLayout_2.addWidget(self.label_4, 1, 0, 1, 1, QtCore.Qt.AlignmentFlag.AlignHCenter)
-        
-        self.label_6 = QtWidgets.QLabel(parent=self.gridLayoutWidget_2)
-        self.label_6.setObjectName("label_6")
-        self.gridLayout_2.addWidget(self.label_6, 2, 0, 1, 1, QtCore.Qt.AlignmentFlag.AlignHCenter)
-        
-        self.label_7 = QtWidgets.QLabel(parent=self.gridLayoutWidget_2)
-        self.label_7.setObjectName("label_7")
-        self.gridLayout_2.addWidget(self.label_7, 2, 1, 1, 1, QtCore.Qt.AlignmentFlag.AlignHCenter)
-        
+        # Create widgets to hold the grid layouts
+        self.leftWidget = QtWidgets.QWidget(self.mainContentWidget)
+        self.leftWidget.setObjectName("leftWidget")
+        self.rightWidget = QtWidgets.QWidget(self.mainContentWidget)
+        self.rightWidget.setObjectName("rightWidget")
+
+        # Create grid layouts and set them to the widgets
+        self.leftGrid = QtWidgets.QGridLayout(self.leftWidget)
+        self.leftGrid.setObjectName("leftGrid")
+        self.rightGrid = QtWidgets.QGridLayout(self.rightWidget)
+        self.rightGrid.setObjectName("rightGrid")
+
+        # Add the widgets to the main content layout
+        self.mainContentLayout.addWidget(self.leftWidget)
+        self.mainContentLayout.addWidget(self.rightWidget)
+        self.saveButton = QtWidgets.QPushButton(self.centralwidget)
+        self.saveButton.setStyleSheet(style.button())
+        self.saveButton.setObjectName("saveButton")
+        self.saveButton.setText("Mentés")
+        self.saveButton.setGeometry(QtCore.QRect(30, 600, 731, 80))
+        self.saveButton.setEnabled(False)
+        self.saveButton.setVisible(False)
         settingsWindow.setCentralWidget(self.centralwidget)
-        
 
         self.retranslateUi(settingsWindow)
         QtCore.QMetaObject.connectSlotsByName(settingsWindow)
 
-    def savePreferences(self):
-            # Your code to handle the button click event
-            selected= [self.thumbsDown.currentText(), self.victory.currentText(), self.pointingUp.currentText(), self.thumbsUp.currentText(),self.inputSource.currentText()]
-            preferences.create_preferences(selected)
-            msg = QtWidgets.QMessageBox()
-            msg.setIcon(QtWidgets.QMessageBox.Icon.Information)
-            msg.setText("Beállítások elmentve!")
-            msg.setWindowTitle("Sikeres mentés")
-            msg.exec()
-
-
-    def updateComboBoxes(self):
-            selected_items = {
-            self.thumbsDown: self.thumbsDown.currentText(),
-            self.victory: self.victory.currentText(),
-            self.pointingUp: self.pointingUp.currentText(),
-            self.thumbsUp: self.thumbsUp.currentText()
-            }
-
-            for combo in [self.thumbsDown, self.victory, self.pointingUp, self.thumbsUp]:
-                for i in range(combo.count()):
-                    item_text = combo.itemText(i)
-                    if item_text in selected_items.values() and selected_items[combo] != item_text:
-                        combo.model().item(i).setEnabled(False)
-                    else:
-                        combo.model().item(i).setEnabled(True)
-
     def retranslateUi(self, settingsWindow):
         _translate = QtCore.QCoreApplication.translate
-        settingsWindow.setWindowTitle(_translate("settingsWindow", "Settings"))
-        self.label.setText(_translate("settingsWindow", "Használati Útmutató"))
-        self.label_2.setText(_translate("settingsWindow", "Vezérlőpult"))
-        self.saveSettings.setText(_translate("settingsWindow", "Beállítások mentése"))
-        self.inputSourceLabel.setText(_translate("settingsWindow", "Bemeneti forrás kiválasztása"))
-        self.label_3.setText(_translate("settingsWindow", style.hasbara()))
-        self.label_5.setText(_translate("settingsWindow", style.victory()))
-        self.label_4.setText(_translate("settingsWindow", style.thumbsUp()))
-        self.label_6.setText(_translate("settingsWindow", style.thumbsDown()))
-        self.label_7.setText(_translate("settingsWindow", style.pointingUp()))
+        settingsWindow.setWindowTitle(_translate("settingsWindow", "Beállítások"))
+        self.label.setText(_translate("settingsWindow", "JSON fájl kiválasztása"))
+
+    def openFileDialog(self):
+        fileName, _ = QtWidgets.QFileDialog.getOpenFileName(
+            parent=self.centralwidget,  # Parent set to centralwidget for better modality
+            caption="Select JSON File",
+            directory="",  # Initial directory
+            filter="JSON Files (*.json);;All Files (*)",  # File types filter
+        )
+        if fileName:
+            try:
+                with open(fileName, 'r', encoding='utf-8') as file:
+                    data = json.load(file)
+                    if isinstance(data, dict):
+                        usedTaskFile = data.get("task")
+                        print(usedTaskFile)
+                        data.pop("task", None)  # Remove "task" key if it exists
+                        selected_prefs.append(data)
+                        self.fileDialogButton.setEnabled(False)
+                        self.addOptions()
+                        global usedJsonFile
+                        usedJsonFile = fileName
+                    else:
+                        message = QtWidgets.QMessageBox()
+                        message.setWindowTitle("Error")
+                        message.setText("A JSON fájl nem tartalmazza a megfelelő adatokat!")
+                        message.setIcon(QtWidgets.QMessageBox.Icon.Warning)
+                        message.exec()
+            except Exception as e:
+                message = QtWidgets.QMessageBox()
+                message.setWindowTitle("Error")
+                message.setText(f"Hiba a JSON fájl beolvasása közben: {e}")
+                message.setIcon(QtWidgets.QMessageBox.Icon.Critical)
+                message.exec()
+
+    def addOptions(self):
+        
+        # Clear existing widgets in the grids if needed
+        for i in reversed(range(self.leftGrid.count())): 
+            self.leftGrid.itemAt(i).widget().setParent(None)
+        for i in reversed(range(self.rightGrid.count())): 
+            self.rightGrid.itemAt(i).widget().setParent(None)
+        
+        # Add gesture label
+        self.gestureLabel = QtWidgets.QLabel(parent=self.leftWidget)
+        self.gestureLabel.setObjectName("gestureLabel")
+        self.gestureLabel.setText("Gesztus")
+        self.leftGrid.addWidget(self.gestureLabel, 0, 0, 1, 1)
+        self.gestureLabel.setStyleSheet(style.mainContentLabel())
+        
+        # Add options label
+        self.optionsLabel = QtWidgets.QLabel(parent=self.rightWidget)
+        self.optionsLabel.setObjectName("optionsLabel")
+        self.optionsLabel.setText("hozzárendelés")
+        self.rightGrid.addWidget(self.optionsLabel, 0, 0, 1, 1)
+        self.optionsLabel.setStyleSheet(style.mainContentLabel())
     
+        # Store combo boxes for later access
+        self.comboBoxes = []
+    
+        # Add dynamic options based on selected_prefs
+        row = 1
+        for gesture, description in selected_prefs[0].items():
+            gestureLabel = QtWidgets.QLabel(parent=self.leftWidget)
+            gestureLabel.setObjectName(f"{gesture}RadioButton")
+            gestureLabel.setText(description)
+            gestureLabel.setStyleSheet(style.mainContentLabel())
+            self.leftGrid.addWidget(gestureLabel, row, 0, 1, 1)
+            
+            optionsComboBox = QtWidgets.QComboBox(parent=self.rightWidget)
+            optionsComboBox.setObjectName(f"{gesture}ComboBox")
+            optionsComboBox.addItems(possible_commands)
+            optionsComboBox.setStyleSheet(style.mainContentCombobox())
+            self.rightGrid.addWidget(optionsComboBox, row, 0, 1, 1)
+            
+            # Connect the signal to a slot to handle option selection
+            optionsComboBox.currentIndexChanged.connect(self.updateComboBoxes)
+            
+            self.comboBoxes.append(optionsComboBox)
+            row += 1
+        self.IPlabel = QtWidgets.QLabel(parent=self.leftWidget)
+        self.IPlabel.setObjectName("IPlabel")
+        self.IPlabel.setText("IP cím (ha üres, alapértelmezett kamerát használja)")
+        self.leftGrid.addWidget(self.IPlabel, row, 0, 1, 1) 
+        self.ipInput = QtWidgets.QLineEdit(parent=self.rightWidget)
+        self.ipInput.setObjectName("ipInput")
+        self.ipInput.setStyleSheet(style.mainContentCombobox())
+        self.rightGrid.addWidget(self.ipInput, row, 0, 1, 1)
+        self.saveButton.setVisible(True)
+        self.saveButton.clicked.connect(self.savePreferences)
+        self.saveButton.setEnabled(True)
+    
+    def savePreferences(self):
+        selected_choices = self.getComboBoxChoices()
+        ipAddress = self.ipInput.text()
+        message = QtWidgets.QMessageBox()
+        message.setWindowTitle("Sikeres mentés")
+        message.setText("A beállítások sikeresen elmentve!")
+        message.setIcon(QtWidgets.QMessageBox.Icon.Information)
+        message.exec()
+        preferences.createPreferences(selected_prefs, selected_choices, ipAddress)
+
+    def getComboBoxChoices(self):
+        choices = []
+        for comboBox in self.comboBoxes:
+            choices.append(comboBox.currentText())
+        return choices
+    
+    def updateComboBoxes(self):
+        selected_items = set()
+        for comboBox in self.comboBoxes:
+            selected_items.add(comboBox.currentText())
+        
+        for comboBox in self.comboBoxes:
+            for index in range(comboBox.count()):
+                item_text = comboBox.itemText(index)
+                if item_text in selected_items and item_text != comboBox.currentText():
+                    comboBox.model().item(index).setEnabled(False)
+                else:
+                    comboBox.model().item(index).setEnabled(True)
+
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()

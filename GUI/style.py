@@ -26,13 +26,17 @@ def dropDownMenu():
         color: gray;
     }
     """
+def mainContentLabel():
+   return "text-align: center; max-height:100px;font-size: 24pt;"
+def mainContentCombobox():
+    return "background-color: #385b7d; border-radius: 5px; max-height: 50px;font-size: 24pt; padding:25px"
 def hasbara():
     return "hasbara"
 def thumbsUp():
-    return '<html><head/><body><p>Thumbs Up<br/><span style="font-size:14pt;">hüvelykujj mutatása<br>felfelé</span></p></body></html>'
+    return '<html><head/><body><p>Thumbs Up<br/><img src="thumbsup.png"/></p></body></html>'
 def thumbsDown():
-   return '<html><head/><body><p>Thumbs Down<br/><span style="font-size:14pt;">hüvelykujj mutatása<br>lefelé</span></p></body></html>'
+   return '<html><head/><body><p>Thumbs Down<br/><img src="thumbsdonw.png"/></p></body></html>'
 def pointingUp():
-    return '<html><head/><body><p>Pointing Up<br/><span style="font-size:14pt;">mutatóujj mutatása<br>felfelé</span></p></body></html>'
+    return '<html><head/><body><p>Pointing Up<br/><img src=""/></p></body></html>'
 def victory():
-   return '<html><head/><body><p>Victory<br/><span style="font-size:14pt;">győzelmi jel<br>mutatása<br>mutató és<br>középső ujjakkal</span></p></body></html>'
+   return '<html><head/><body><p>Victory<br/><img src=""/></p></body></html>'
