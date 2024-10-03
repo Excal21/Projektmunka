@@ -1,5 +1,4 @@
 import json
-import output
 
 def createPreferences(gestures, preferences,ipAddress):
     gest_dict = gestures[0].keys()
