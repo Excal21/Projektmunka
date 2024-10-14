@@ -4,131 +4,15 @@ import style
 import preferences
 import json
 import webbrowser
+import main
 
-selected_prefs = []
-possible_commands = ["Ctrl+C", "Ctrl+V", "Böngésző megnyitása", "fényerő növelése", "fényerő csökkentése"]
-usedJsonFile = ""
-usedTaskFile = ""
+class Ui_settingsWindow(QtCore.QObject):
+    taskFileUpdated = QtCore.pyqtSignal(str)
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 600)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Minimum)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
-        MainWindow.setSizePolicy(sizePolicy)
-        MainWindow.setStyleSheet(style.mainWindowStyle())
-        
-        # Central widget
-        self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
-        self.centralwidget.setObjectName("centralwidget")
+    def __init__(self):
+        super().__init__()
+        self.usedTaskFile = None  # Store the passed task file locally
 
-        # Navigation buttons widget
-        self.navButtonsWidget = QtWidgets.QWidget(parent=self.centralwidget)
-        self.navButtonsWidget.setGeometry(QtCore.QRect(40, 420, 721, 101))
-        self.navButtonsWidget.setStyleSheet("horizontal-alignment: center;")
-        self.navButtonsWidget.setObjectName("navButtonsWidget")
-        
-        self.horizontalLayout = QtWidgets.QHBoxLayout(self.navButtonsWidget)
-        self.horizontalLayout.setSizeConstraint(QtWidgets.QLayout.SizeConstraint.SetMinimumSize)
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout.setSpacing(10)
-        self.horizontalLayout.setObjectName("horizontalLayout")
-
-        # Buttons
-        self.pushButton = QtWidgets.QPushButton(parent=self.navButtonsWidget)
-        self.pushButton.setMinimumSize(QtCore.QSize(0, 28))
-        self.pushButton.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
-        self.pushButton.setStyleSheet(style.button())
-        self.pushButton.setObjectName("pushButton")
-        self.horizontalLayout.addWidget(self.pushButton)
-        self.pushButton.clicked.connect(self.startRecognition)
-
-        self.pushButton_2 = QtWidgets.QPushButton(parent=self.navButtonsWidget)
-        self.pushButton_2.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
-        self.pushButton_2.setStyleSheet(style.button())
-        self.pushButton_2.setObjectName("pushButton_2")
-        self.pushButton_2.clicked.connect(self.openSettings)
-        self.horizontalLayout.addWidget(self.pushButton_2)
-        
-        # Label
-        self.label = QtWidgets.QLabel(parent=self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(260, 30, 281, 81))
-        self.label.setStyleSheet("text-align: center;")
-        self.label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.label.setObjectName("label")
-
-        # Other labels
-        self.horizontalWidget = QtWidgets.QWidget(parent=self.centralwidget)
-        self.horizontalWidget.setGeometry(QtCore.QRect(40, 130, 721, 271))
-        self.horizontalWidget.setObjectName("horizontalWidget")
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.horizontalWidget)
-        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-
-        self.label_3 = QtWidgets.QLabel(parent=self.horizontalWidget)
-        self.label_3.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.label_3.setObjectName("label_3")
-        self.horizontalLayout_2.addWidget(self.label_3)
-
-        self.label_2 = QtWidgets.QLabel(parent=self.horizontalWidget)
-        self.label_2.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.label_2.setObjectName("label_2")
-        self.horizontalLayout_2.addWidget(self.label_2)
-
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.statusbar = QtWidgets.QStatusBar(parent=MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
-
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
-
-        # Create the settings window instance here
-        self.settingsWindow = QtWidgets.QMainWindow()
-        self.ui_settings = Ui_settingsWindow()
-        self.ui_settings.setupUi(self.settingsWindow)
-
-    
-    def startRecognition(self):
-        try:
-            with open('preferences.json', 'r', encoding='utf-8') as file:
-                data = json.load(file)
-                if data and usedJsonFile != "":  # Check if data is not empty
-                    print("sandor_pipas_kepe.png")
-                    print("itt nincs semmi, de ezt a Ricsi nem tudja")
-                    print("hasznalt .task fajl: ", usedTaskFile)
-                    
-                    if self.pushButton.text() == "Használat":
-                        self.pushButton.setText("megállítás")  # Change button text to "megállítás"
-                        self.pushButton_2.setEnabled(False)  # Disable pushButton_2
-                    else:
-                        self.pushButton.setText("Használat")  # Change button text back to "Használat"
-                        self.pushButton_2.setEnabled(True)  # Enable pushButton_2
-        except Exception as e:
-            message = QtWidgets.QMessageBox()
-            message.setWindowTitle("Hiba")
-            message.setText("Nincs kiválasztott fájl!")
-            message.setIcon(QtWidgets.QMessageBox.Icon.Warning)
-            message.exec()
-            return
-        
-    def openSettings(self):
-        self.settingsWindow.show()
-
-    def retranslateUi(self, MainWindow):
-        _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "GestureMaster"))
-        self.pushButton.setText(_translate("MainWindow", "Használat"))
-        self.pushButton_2.setText(_translate("MainWindow", "Beállítások"))
-        self.label.setText(_translate("MainWindow", "GestureMaster"))
-        self.label_3.setText(_translate("MainWindow", style.projectDescription()))
-        self.label_2.setText(_translate("MainWindow", style.contacts()))
-        open('preferences.json', 'w').close()
-
-class Ui_settingsWindow(object):
     def setupUi(self, settingsWindow):
         settingsWindow.setObjectName("settingsWindow")
         settingsWindow.resize(900, 700)
@@ -194,7 +78,7 @@ class Ui_settingsWindow(object):
 
         self.retranslateUi(settingsWindow)
         QtCore.QMetaObject.connectSlotsByName(settingsWindow)
-
+        
     def retranslateUi(self, settingsWindow):
         _translate = QtCore.QCoreApplication.translate
         settingsWindow.setWindowTitle(_translate("settingsWindow", "Beállítások"))
@@ -212,14 +96,11 @@ class Ui_settingsWindow(object):
                 with open(fileName, 'r', encoding='utf-8') as file:
                     data = json.load(file)
                     if isinstance(data, dict):
-                        usedTaskFile = data.get("task")
-                        print(usedTaskFile)
+                        self.usedTaskFile = data.get("task")
                         data.pop("task", None)  # Remove "task" key if it exists
-                        selected_prefs.append(data)
-                        self.fileDialogButton.setEnabled(False)
+                        main.selected_prefs.append(data)
                         self.addOptions()
-                        global usedJsonFile
-                        usedJsonFile = fileName
+                        self.sendTaskFileToMain()
                     else:
                         message = QtWidgets.QMessageBox()
                         message.setWindowTitle("Error")
@@ -234,7 +115,6 @@ class Ui_settingsWindow(object):
                 message.exec()
 
     def addOptions(self):
-        
         # Clear existing widgets in the grids if needed
         for i in reversed(range(self.leftGrid.count())): 
             self.leftGrid.itemAt(i).widget().setParent(None)
@@ -257,10 +137,10 @@ class Ui_settingsWindow(object):
     
         # Store combo boxes for later access
         self.comboBoxes = []
-    
+
         # Add dynamic options based on selected_prefs
         row = 1
-        for gesture, description in selected_prefs[0].items():
+        for gesture, description in main.selected_prefs[0].items():
             gestureLabel = QtWidgets.QLabel(parent=self.leftWidget)
             gestureLabel.setObjectName(f"{gesture}RadioButton")
             gestureLabel.setText(description)
@@ -269,7 +149,7 @@ class Ui_settingsWindow(object):
             
             optionsComboBox = QtWidgets.QComboBox(parent=self.rightWidget)
             optionsComboBox.setObjectName(f"{gesture}ComboBox")
-            optionsComboBox.addItems(possible_commands)
+            optionsComboBox.addItems(main.possible_commands)
             optionsComboBox.setStyleSheet(style.mainContentCombobox())
             self.rightGrid.addWidget(optionsComboBox, row, 0, 1, 1)
             
@@ -298,7 +178,7 @@ class Ui_settingsWindow(object):
         message.setText("A beállítások sikeresen elmentve!")
         message.setIcon(QtWidgets.QMessageBox.Icon.Information)
         message.exec()
-        preferences.createPreferences(selected_prefs, selected_choices, ipAddress)
+        preferences.createPreferences(main.selected_prefs, selected_choices, ipAddress)
 
     def getComboBoxChoices(self):
         choices = []
@@ -319,10 +199,8 @@ class Ui_settingsWindow(object):
                 else:
                     comboBox.model().item(index).setEnabled(True)
 
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec())
+    def sendTaskFileToMain(self):
+        self.taskFileUpdated.emit(self.usedTaskFile)
+
+    def setTaskFile(self, task_file):
+        self.usedTaskFile = task_file
