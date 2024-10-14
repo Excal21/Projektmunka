@@ -24,11 +24,12 @@ def dropDownMenu():
     }
     QComboBox QAbstractItemView::item:first {
         color: gray;
-        border-radius: 5px;
     }
     """
 def mainContentLabel():
-   return "text-align: center; max-height:30px;font-size: 24pt;"
+   return "text-align: center; max-height:100px;font-size: 24pt;"
+def mainContentCombobox():
+    return "background-color: #385b7d; border-radius: 5px; max-height: 50px;font-size: 24pt; padding:25px"
 def hasbara():
     return "hasbara"
 def thumbsUp():

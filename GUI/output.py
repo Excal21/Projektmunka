@@ -96,9 +96,10 @@ class Ui_MainWindow(object):
         try:
             with open('preferences.json', 'r', encoding='utf-8') as file:
                 data = json.load(file)
-                if data and usedJsonFile != "" and usedTaskFile != "0":  # Check if data is not empty
-                    
-                    print(usedTaskFile)
+                if data and usedJsonFile != "":  # Check if data is not empty
+                    print("sandor_pipas_kepe.png")
+                    print("itt nincs semmi, de ezt a Ricsi nem tudja")
+                    print("hasznalt .task fajl: ", usedTaskFile)
                     
                     if self.pushButton.text() == "Használat":
                         self.pushButton.setText("megállítás")  # Change button text to "megállítás"
@@ -200,7 +201,6 @@ class Ui_settingsWindow(object):
         self.label.setText(_translate("settingsWindow", "JSON fájl kiválasztása"))
 
     def openFileDialog(self):
-        global usedTaskFile
         fileName, _ = QtWidgets.QFileDialog.getOpenFileName(
             parent=self.centralwidget,  # Parent set to centralwidget for better modality
             caption="Select JSON File",
@@ -210,10 +210,8 @@ class Ui_settingsWindow(object):
         if fileName:
             try:
                 with open(fileName, 'r', encoding='utf-8') as file:
-
                     data = json.load(file)
                     if isinstance(data, dict):
-                        
                         usedTaskFile = data.get("task")
                         print(usedTaskFile)
                         data.pop("task", None)  # Remove "task" key if it exists
@@ -272,7 +270,7 @@ class Ui_settingsWindow(object):
             optionsComboBox = QtWidgets.QComboBox(parent=self.rightWidget)
             optionsComboBox.setObjectName(f"{gesture}ComboBox")
             optionsComboBox.addItems(possible_commands)
-            optionsComboBox.setStyleSheet(style.dropDownMenu())
+            optionsComboBox.setStyleSheet(style.mainContentCombobox())
             self.rightGrid.addWidget(optionsComboBox, row, 0, 1, 1)
             
             # Connect the signal to a slot to handle option selection
@@ -282,12 +280,11 @@ class Ui_settingsWindow(object):
             row += 1
         self.IPlabel = QtWidgets.QLabel(parent=self.leftWidget)
         self.IPlabel.setObjectName("IPlabel")
-        self.IPlabel.setStyleSheet(style.mainContentLabel())
-        self.IPlabel.setText("IP cím (ha üres, alapértelmezett\n kamerát használja)")
+        self.IPlabel.setText("IP cím (ha üres, alapértelmezett kamerát használja)")
         self.leftGrid.addWidget(self.IPlabel, row, 0, 1, 1) 
         self.ipInput = QtWidgets.QLineEdit(parent=self.rightWidget)
         self.ipInput.setObjectName("ipInput")
-        self.ipInput.setStyleSheet(style.dropDownMenu())
+        self.ipInput.setStyleSheet(style.mainContentCombobox())
         self.rightGrid.addWidget(self.ipInput, row, 0, 1, 1)
         self.saveButton.setVisible(True)
         self.saveButton.clicked.connect(self.savePreferences)
