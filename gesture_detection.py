@@ -2,6 +2,7 @@
 # Bővebb információ Google MediaPiperól az alábbi linken érhető el:
 # https://ai.google.dev/edge/mediapipe 
 
+import os
 import cv2
 import mediapipe as mp
 from time import sleep
@@ -12,7 +13,7 @@ import requests
 import numpy as np
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
-
+from datetime import datetime
 
 MARGIN = 10  # pixels
 FONT_SIZE = 1
@@ -42,8 +43,8 @@ def draw_landmarks_on_image(rgb_image, detection_result):
       annotated_image,
       hand_landmarks_proto,
       solutions.hands.HAND_CONNECTIONS,
-      solutions.drawing_styles.get_default_hand_landmarks_style(),
-      solutions.drawing_styles.get_default_hand_connections_style())
+      solutions.drawing_utils.DrawingSpec(color=(33, 43, 53), thickness=2, circle_radius=4),
+      solutions.drawing_utils.DrawingSpec(color=(156, 220, 254), thickness=3))
 
     # Get the top left corner of the detected hand's bounding box.
     height, width, _ = annotated_image.shape
@@ -55,7 +56,7 @@ def draw_landmarks_on_image(rgb_image, detection_result):
     # Draw handedness (left or right hand) on the image.
     cv2.putText(annotated_image, f"{handedness[0].category_name}",
                 (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX,
-                FONT_SIZE, HANDEDNESS_TEXT_COLOR, FONT_THICKNESS, cv2.LINE_AA)
+                FONT_SIZE, (0, 0, 0), FONT_THICKNESS, cv2.LINE_AA)
 
   return annotated_image
 
@@ -65,28 +66,28 @@ model_file = open('gesture_recognizer.task', "rb")
 model_data = model_file.read()
 model_file.close()
 base_options = python.BaseOptions(model_asset_buffer=model_data)
+
+
 options = vision.GestureRecognizerOptions(
     base_options=base_options,
-    min_tracking_confidence=0.5,
-    num_hands=2
-
+    min_tracking_confidence=0.7,
+    
+    num_hands=4
     )
 
 recognizer = vision.GestureRecognizer.create_from_options(options)
 
-url = "http://192.168.1.12:8080/shot.jpg" #Telefon kamera
-#cap = cv2.VideoCapture(0)    #Beépített kamera
+last_gestures = []
+last_gesture_time = datetime.now()
+
+url = "http://192.168.1.12:8080/video" #Telefon kamera
+cap = cv2.VideoCapture(0)    #Beépített kamera
 
 while True: 
     #Beépített kamera
-    #ret, img = cap.read()
-    #img = cv2.flip(img, 1)
+    ret, img = cap.read()
+    img = cv2.flip(img, 1)
 
-
-    #Telefon kamera
-    img_resp = requests.get(url)
-    img_arr = np.array(bytearray(img_resp.content), dtype=np.uint8)
-    img = cv2.imdecode(img_arr, -1)
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     
     
@@ -97,16 +98,19 @@ while True:
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=img)
     result = recognizer.recognize(mp_image)
 
-    #0-ás index a bal kéz, 1 a jobb
-    if len(result.gestures) == 1 and result.gestures[0][0].category_name != 'None':
-        print('Egy kezes gesztus: ' + result.gestures[0][0].category_name)
-        sleep(0.01)
-    elif len(result.gestures) == 2 and result.gestures[0][0].category_name != 'None' and result.gestures[1][0].category_name != 'None':
-        print('Bal kéz: ' + ' ' + result.gestures[0][0].category_name + ' ' +
-              'Jobb kéz: ' + ' ' + result.gestures[1][0].category_name)
-        sleep(0.01)
-    
+    if len(result.gestures) >= 1:
+       for gesture in result.gestures:
+          if gesture[0].category_name != 'NONE' and gesture[0].category_name != '':
+            if gesture[0].score > 0.97:
+              print(f"{gesture[0].category_name} Confidence: {gesture[0].score:.2f}")
+              last_gestures.append(gesture[0].category_name)
 
+    if len(last_gestures) >= 7:
+      if all(gesture == last_gestures[0] for gesture in last_gestures) and (datetime.now() - last_gesture_time).total_seconds() > 1 and last_gestures[0]  != '':
+        print(last_gestures[0])
+        last_gesture_time = datetime.now()
+      last_gestures = []
+      
 
     annotated_image = draw_landmarks_on_image(mp_image.numpy_view(), result)
 
