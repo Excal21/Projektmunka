@@ -60,21 +60,19 @@ def draw_landmarks_on_image(rgb_image, detection_result):
 
   return annotated_image
 
-def invokeCommand(gesturestr : str):
-  if gesturestr == "2Metal":
-      os.system("start https://www.youtube.com/watch?v=E0ozmU9cJDg")
-  elif gesturestr == "F":
-     os.system("start explorer")
 
 #Modelfájl betöltése és beállítása
 model_file = open('gesture_recognizer.task', "rb")
 model_data = model_file.read()
 model_file.close()
 base_options = python.BaseOptions(model_asset_buffer=model_data)
+
+
 options = vision.GestureRecognizerOptions(
     base_options=base_options,
-    min_tracking_confidence=0.5,
-    num_hands=2
+    min_tracking_confidence=0.7,
+    
+    num_hands=4
     )
 
 recognizer = vision.GestureRecognizer.create_from_options(options)
@@ -82,7 +80,7 @@ recognizer = vision.GestureRecognizer.create_from_options(options)
 last_gestures = []
 last_gesture_time = datetime.now()
 
-url = "http://10.4.67.8:8080/video" #Telefon kamera
+url = "http://192.168.1.12:8080/video" #Telefon kamera
 cap = cv2.VideoCapture(0)    #Beépített kamera
 
 while True: 
@@ -100,23 +98,16 @@ while True:
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=img)
     result = recognizer.recognize(mp_image)
 
-
-    #0-ás index a bal kéz, 1 a jobb
-    if len(result.gestures) == 1 and result.gestures[0][0].category_name != 'None':
-        #print('Egy kezes gesztus: ' + result.gestures[0][0].category_name)
-        sleep(0.01)
-        last_gestures.append(result.gestures[0][0].category_name)
-
-    # elif len(result.gestures) == 2 and result.gestures[0][0].category_name != 'None' and result.gestures[1][0].category_name != 'None':
-    #     print('Bal kéz: ' + ' ' + result.gestures[0][0].category_name + ' ' +
-    #           'Jobb kéz: ' + ' ' + result.gestures[1][0].category_name)
-    #     sleep(0.01)
-    
+    if len(result.gestures) >= 1:
+       for gesture in result.gestures:
+          if gesture[0].category_name != 'NONE' and gesture[0].category_name != '':
+            if gesture[0].score > 0.97:
+              print(f"{gesture[0].category_name} Confidence: {gesture[0].score:.2f}")
+              last_gestures.append(gesture[0].category_name)
 
     if len(last_gestures) >= 7:
       if all(gesture == last_gestures[0] for gesture in last_gestures) and (datetime.now() - last_gesture_time).total_seconds() > 1 and last_gestures[0]  != '':
         print(last_gestures[0])
-        invokeCommand(last_gestures[0])
         last_gesture_time = datetime.now()
       last_gestures = []
       

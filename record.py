@@ -1,19 +1,22 @@
 import cv2
 import os
+from datetime import datetime
 
 # Mappa létrehozása, ha nem létezik
-output_dir = "GESZTUS_NEVE"
+output_dir = "THUMBSUP"
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
 # Kamera inicializálása
-url = "http://192.168.193.124:8080/video"
+url = "http://192.168.1.12:8080/video"
 cap = cv2.VideoCapture(0)
 
 width = 500
 height = 500
 
 img_counter = 0
+
+last_photo = datetime.now()
 
 while True:
     ret, frame = cap.read()
@@ -35,11 +38,12 @@ while True:
     if key % 256 == 27:  # ESC billentyű
         print("Kilépés...")
         break
-    elif key % 256 == 32:  # Space billentyű
-        img_name = os.path.join(output_dir, f"kamera_kep2_{img_counter}.png")
+    elif key % 256 == 32:# or (datetime.now()-last_photo).total_seconds() >= 0.5 :  # Space billentyű
+        img_name = os.path.join(output_dir, f"kamera_kep1_{img_counter}.png")
         cv2.imwrite(img_name, cropped_frame)
         print(f"{img_name} elmentve!")
         img_counter += 1
+        last_photo = datetime.now()
 
 cap.release()
 cv2.destroyAllWindows()
