@@ -1,5 +1,11 @@
 {
-    "2up": "Ctrl+C",
-    "metal": "Ctrl+C",
-    "middle_finger": "Ctrl+C"
+    "2up": "Ctrl+V",
+    "metal": "",
+    "middle_finger": "Böngésző megnyitása",
+    "drei_glaser": "Ctrl+C",
+    "fist": "",
+    "peace": "",
+    "perfect": "",
+    "camFeed": true,
+    "sensitivity": "5"
 }

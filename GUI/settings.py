@@ -1,4 +1,6 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtGui import QIntValidator
+
 import sys
 import style
 import preferences
@@ -150,7 +152,7 @@ class Ui_settingsWindow(QtCore.QObject):
             optionsComboBox = QtWidgets.QComboBox(parent=self.rightWidget)
             optionsComboBox.setObjectName(f"{gesture}ComboBox")
             optionsComboBox.addItems(main.possible_commands)
-            optionsComboBox.setStyleSheet(style.mainContentCombobox())
+            optionsComboBox.setStyleSheet(style.dropDownMenu())
             self.rightGrid.addWidget(optionsComboBox, row, 0, 1, 1)
             
             # Connect the signal to a slot to handle option selection
@@ -158,14 +160,62 @@ class Ui_settingsWindow(QtCore.QObject):
             
             self.comboBoxes.append(optionsComboBox)
             row += 1
+        
+        # Add sensitivity label and input
+        self.sensitivityLabel = QtWidgets.QLabel(parent=self.leftWidget) 
+        self.sensitivityLabel.setObjectName("sensitivityLabel")
+        self.sensitivityLabel.setText("Érzékenység")
+        self.leftGrid.addWidget(self.sensitivityLabel, row, 0, 1, 1)
+        self.sensitivityLabel.setStyleSheet(style.mainContentLabel())
+        
+        self.sensitivityInput = QtWidgets.QLineEdit(parent=self.rightWidget)
+        self.sensitivityInput.setObjectName("sensitivityInput")
+        self.sensitivityInput.setStyleSheet(style.dropDownMenu())
+        self.sensitivityInput.setPlaceholderText("1-25")
+        self.sensitivityInput.setText("5")
+        self.sensitivityInput.setSizeIncrement(1, 1)
+
+        # Set the validator to only allow integers between 1 and 25
+        int_validator = QIntValidator(1, 25)
+        self.sensitivityInput.setValidator(int_validator)
+
+        self.rightGrid.addWidget(self.sensitivityInput, row, 0, 1, 1)
+        row += 1
+
+        # Add IP label and input
         self.IPlabel = QtWidgets.QLabel(parent=self.leftWidget)
         self.IPlabel.setObjectName("IPlabel")
+        self.IPlabel.setStyleSheet(style.mainContentLabel())
         self.IPlabel.setText("IP cím (ha üres, alapértelmezett kamerát használja)")
         self.leftGrid.addWidget(self.IPlabel, row, 0, 1, 1) 
+        
         self.ipInput = QtWidgets.QLineEdit(parent=self.rightWidget)
         self.ipInput.setObjectName("ipInput")
-        self.ipInput.setStyleSheet(style.mainContentCombobox())
+        self.ipInput.setStyleSheet(style.dropDownMenu())
+        self.ipInput.setPlaceholderText("255.255.255.255")
+        # Use QRegularExpressionValidator with a more precise regular expression for IP addresses
+        ip_validator = QtGui.QRegularExpressionValidator(QtCore.QRegularExpression(
+            r"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+        ))
+        self.ipInput.setValidator(ip_validator)
+
         self.rightGrid.addWidget(self.ipInput, row, 0, 1, 1)
+        row += 1
+
+        # Add camera feed label and radio button
+        self.camFeedLabel = QtWidgets.QLabel(parent=self.leftWidget)
+        self.camFeedLabel.setObjectName("camFeedLabel") 
+        self.camFeedLabel.setText("Kamerakép?")
+        self.camFeedLabel.setStyleSheet(style.mainContentLabel())
+        self.leftGrid.addWidget(self.camFeedLabel, row, 0, 1, 1)
+
+        self.camFeedCheckBox = QtWidgets.QCheckBox(parent=self.rightWidget) 
+        self.camFeedCheckBox.setObjectName("camFeedCheckBox")
+        self.camFeedCheckBox.setStyleSheet(style.dropDownMenu())
+        self.camFeedCheckBox.setChecked(True)
+        self.rightGrid.addWidget(self.camFeedCheckBox, row, 0, 1, 1)
+        row += 1
+
         self.saveButton.setVisible(True)
         self.saveButton.clicked.connect(self.savePreferences)
         self.saveButton.setEnabled(True)
@@ -173,12 +223,14 @@ class Ui_settingsWindow(QtCore.QObject):
     def savePreferences(self):
         selected_choices = self.getComboBoxChoices()
         ipAddress = self.ipInput.text()
+        sensitivity = self.sensitivityInput.text()
+        radioButton = self.camFeedCheckBox.isChecked()  # Correctly get the state of the radio button
         message = QtWidgets.QMessageBox()
         message.setWindowTitle("Sikeres mentés")
         message.setText("A beállítások sikeresen elmentve!")
         message.setIcon(QtWidgets.QMessageBox.Icon.Information)
         message.exec()
-        preferences.createPreferences(main.selected_prefs, selected_choices, ipAddress)
+        preferences.createPreferences(main.selected_prefs, selected_choices, ipAddress, radioButton, sensitivity)
 
     def getComboBoxChoices(self):
         choices = []
@@ -194,7 +246,7 @@ class Ui_settingsWindow(QtCore.QObject):
         for comboBox in self.comboBoxes:
             for index in range(comboBox.count()):
                 item_text = comboBox.itemText(index)
-                if item_text in selected_items and item_text != comboBox.currentText():
+                if item_text in selected_items and item_text != comboBox.currentText() and item_text!="":
                     comboBox.model().item(index).setEnabled(False)
                 else:
                     comboBox.model().item(index).setEnabled(True)

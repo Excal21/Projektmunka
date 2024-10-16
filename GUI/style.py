@@ -27,7 +27,7 @@ def dropDownMenu():
     }
     """
 def mainContentLabel():
-   return "text-align: center; max-height:100px;font-size: 24pt;"
+   return "text-align: center; max-height:100px;font-size: 20pt; height:30px"
 def mainContentCombobox():
     return "background-color: #385b7d; border-radius: 5px; max-height: 50px;font-size: 24pt; padding:25px"
 def hasbara():

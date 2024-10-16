@@ -7,7 +7,7 @@ import webbrowser
 import settings
 
 selected_prefs = []
-possible_commands = ["Ctrl+C", "Ctrl+V", "Böngésző megnyitása", "fényerő növelése", "fényerő csökkentése"]
+possible_commands = ["","Ctrl+C", "Ctrl+V", "Böngésző megnyitása", "fényerő növelése", "fényerő csökkentése"]
 
 class Ui_MainWindow(object):
     global usedTaskFile
@@ -100,15 +100,16 @@ class Ui_MainWindow(object):
         print(f"Updated usedTaskFile: {usedTaskFile}")
     
     def startRecognition(self):
-        try: 
+        try:
             with open('preferences.json', 'r', encoding='utf-8') as file:
                 data = json.load(file)
                 global usedTaskFile
-                if data != "":  # Check if data is not empty
-                    print("sandor_pipas_kepe.png")
-                    print("itt nincs semmi, de ezt a Ricsi nem tudja")
+                if data:  # Check if data is not empty
                     print("hasznalt .task fajl: ", usedTaskFile)
-                    
+                    camFeed = data.get('camFeed')
+                    sensitivity = data.get('sensitivity')
+                    ipAddress = data.get('ip_address', None)  # Use get method with default value
+
                     if self.pushButton.text() == "Használat":
                         self.pushButton.setText("megállítás")  # Change button text to "megállítás"
                         self.pushButton_2.setEnabled(False)  # Disable pushButton_2

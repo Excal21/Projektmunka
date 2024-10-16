@@ -1,12 +1,12 @@
 import json
-import main
 
-def createPreferences(gestures, preferences,ipAddress):
+def createPreferences(gestures, preferences, ipAddress, radioButton, sensitivity):
     gest_dict = gestures[0].keys()
     
     # Merge gest_dict keys and preferences values into settings dictionary
     settings = {key: preferences[i] for i, key in enumerate(gest_dict)}
-    if ipAddress!="":
+    settings.update({'camFeed': radioButton, 'sensitivity': sensitivity})
+    if ipAddress != "":
         settings.update({'ip_address': ipAddress})
     print(settings)
     
