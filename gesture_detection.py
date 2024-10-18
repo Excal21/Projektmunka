@@ -43,6 +43,7 @@ class Recognition:
 
       self.__camera = 0
       self.__labels = self.__extract_labels(task_file_path)
+      self.confidence = 0.9
 
   @property
   def Get_classes(self):
@@ -62,8 +63,6 @@ class Recognition:
   @property
   def labels(self):
     return self.__labels
-
-
 
   def __extract_labels(self, path):
     # A kibontási könyvtár neve
@@ -116,7 +115,7 @@ class Recognition:
         hand_landmarks_proto,
         solutions.hands.HAND_CONNECTIONS,
         solutions.drawing_utils.DrawingSpec(color=(33, 43, 53), thickness=2, circle_radius=4),
-        solutions.drawing_utils.DrawingSpec(color=(156, 220, 254), thickness=3))
+        solutions.drawing_utils.DrawingSpec(color=(156, 220, 254), thickness=2))
 
       # Get the top left corner of the detected hand's bounding box.
       height, width, _ = annotated_image.shape
@@ -126,9 +125,9 @@ class Recognition:
       text_y = int(min(y_coordinates) * height) - self.MARGIN
 
       # Draw handedness (left or right hand) on the image.
-      cv2.putText(annotated_image, f"{handedness[0].category_name}",
-                  (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX,
-                  self.FONT_SIZE, (0, 0, 0), self.FONT_THICKNESS, cv2.LINE_AA)
+      # cv2.putText(annotated_image, f"{handedness[0].category_name}",
+      #             (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX,
+      #             self.FONT_SIZE, (0, 0, 0), self.FONT_THICKNESS, cv2.LINE_AA)
 
     return annotated_image
 
@@ -156,7 +155,7 @@ class Recognition:
       if len(result.gestures) >= 1:
         for gesture in result.gestures:
             if gesture[0].category_name != 'NONE' and gesture[0].category_name != '':
-              if gesture[0].score > 0.97:
+              if gesture[0].score > self.confidence:
                 print(f"{gesture[0].category_name} Confidence: {gesture[0].score:.2f}")
                 last_gestures.append(gesture[0].category_name)
 
@@ -179,6 +178,8 @@ if __name__ == '__main__':
   recognizer = Recognition("gesture_recognizer.task", "gesture_recognition.config")
   print(recognizer.camera)
   print(recognizer.labels)
+
+  recognizer.confidence = 0.7
   recognizer.Run()
 
 
