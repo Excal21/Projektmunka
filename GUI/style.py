@@ -5,12 +5,29 @@ def  mainWindowStyle():
    return "background-color: #151b23; color: white; font: 20pt \"Bahnschrift\";"
 
 def projectDescription():
-   return "asd"
+   return "Az alkalmazás lehetővé teszi a<br>számítógép kézmozdulatokkal<br>történő irányítását"
 
-def contacts(): 
-   return "asd"
+def descLabelStyle():
+    return "font: 20px \"Bahnschrift\"; text-align: justify; width: 400px; max-width: 350px;"
+
+def mainContentLabel():
+   return "text-align: center; max-height:100px;font-size: 20pt; height:30px"
+
+def hasbara():
+    return "hasbara"
+
 def dropDownMenu():
     return """
+    QLineEdit {
+        font-size: 16pt;
+        background-color: #385b7d;
+        border-radius: 5px;
+        height: 30px;
+    }
+    QCheckBox {
+        color: #385b7d;
+        padding: 6px;
+    }
     QComboBox {
         font-size: 12pt;
         background-color: #385b7d;
@@ -26,17 +43,15 @@ def dropDownMenu():
         color: gray;
     }
     """
-def mainContentLabel():
-   return "text-align: center; max-height:100px;font-size: 20pt; height:30px"
-def mainContentCombobox():
-    return "background-color: #385b7d; border-radius: 5px; max-height: 50px;font-size: 24pt; padding:25px"
-def hasbara():
-    return "hasbara"
-def thumbsUp():
-    return '<html><head/><body><p>Thumbs Up<br/><img src="thumbsup.png"/></p></body></html>'
-def thumbsDown():
-   return '<html><head/><body><p>Thumbs Down<br/><img src="thumbsdonw.png"/></p></body></html>'
-def pointingUp():
-    return '<html><head/><body><p>Pointing Up<br/><img src=""/></p></body></html>'
-def victory():
-   return '<html><head/><body><p>Victory<br/><img src=""/></p></body></html>'
+
+def contacts(): 
+    return """
+        <p>
+            <ul>
+                <li>Email:<br>barszcz.daniel@hallgato.sze.hu</li>
+                <li> 
+                    GitHub:<br>github.com/Excal21/Projektmunka
+                </li>            
+            </ul>
+        </p>
+    """

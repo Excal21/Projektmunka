@@ -73,11 +73,15 @@ class Ui_MainWindow(object):
         self.label_3 = QtWidgets.QLabel(parent=self.horizontalWidget)
         self.label_3.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.label_3.setObjectName("label_3")
+        self.label_3.setStyleSheet(style.descLabelStyle())
         self.horizontalLayout_2.addWidget(self.label_3)
 
         self.label_2 = QtWidgets.QLabel(parent=self.horizontalWidget)
         self.label_2.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.label_2.setObjectName("label_2")
+        self.label_2.setStyleSheet(style.descLabelStyle())
+        self.label_2.setTextFormat(QtCore.Qt.TextFormat.RichText)
+        self.label_2.setText(style.contacts())
         self.horizontalLayout_2.addWidget(self.label_2)
 
         MainWindow.setCentralWidget(self.centralwidget)
@@ -135,7 +139,6 @@ class Ui_MainWindow(object):
         self.pushButton_2.setText(_translate("MainWindow", "Beállítások"))
         self.label.setText(_translate("MainWindow", "GestureMaster"))
         self.label_3.setText(_translate("MainWindow", style.projectDescription()))
-        self.label_2.setText(_translate("MainWindow", style.contacts()))
         open('preferences.json', 'w').close()
     
 if __name__ == "__main__":
