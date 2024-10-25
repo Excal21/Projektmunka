@@ -170,10 +170,11 @@ class Recognition:
   
 
 if __name__ == '__main__':
+  taskFile = "gesture_recognizer.task"
   recognizer = Recognition("gesture_recognizer.task", "gesture_recognition.config")
   print(recognizer.camera)
   print(recognizer.labels)
-  #createGestures(recognizer.labels)
+  gestures.createGestures(recognizer.labels,taskFile)
   recognizer.confidence = 0.7
   recognizer.Run()
 
