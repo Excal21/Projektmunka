@@ -15,6 +15,7 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 from datetime import datetime
 import shutil
+import gestures
 
 class Recognition:
   def __init__(self, task_file_path: str, config_file_path: str):
@@ -172,7 +173,7 @@ if __name__ == '__main__':
   recognizer = Recognition("gesture_recognizer.task", "gesture_recognition.config")
   print(recognizer.camera)
   print(recognizer.labels)
-
+  createGestures(recognizer.labels)
   recognizer.confidence = 0.7
   recognizer.Run()
 
