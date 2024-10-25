@@ -173,7 +173,7 @@ if __name__ == '__main__':
   recognizer = Recognition("gesture_recognizer.task", "gesture_recognition.config")
   print(recognizer.camera)
   print(recognizer.labels)
-  createGestures(recognizer.labels)
+  #createGestures(recognizer.labels)
   recognizer.confidence = 0.7
   recognizer.Run()
 
