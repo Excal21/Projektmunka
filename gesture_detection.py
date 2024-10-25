@@ -46,10 +46,6 @@ class Recognition:
       self.confidence = 0.9
 
   @property
-  def Get_classes(self):
-     return
-
-  @property
   def camera(self):
     return self.__camera
   
@@ -100,12 +96,11 @@ class Recognition:
     handedness_list = detection_result.handedness
     annotated_image = np.copy(rgb_image)
 
-    # Loop through the detected hands to visualize.
     for idx in range(len(hand_landmarks_list)):
       hand_landmarks = hand_landmarks_list[idx]
       handedness = handedness_list[idx]
 
-      # Draw the hand landmarks.
+      #Érzékelt pontok megrajzolása
       hand_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
       hand_landmarks_proto.landmark.extend([
         landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z) for landmark in hand_landmarks
@@ -117,7 +112,6 @@ class Recognition:
         solutions.drawing_utils.DrawingSpec(color=(33, 43, 53), thickness=2, circle_radius=4),
         solutions.drawing_utils.DrawingSpec(color=(156, 220, 254), thickness=2))
 
-      # Get the top left corner of the detected hand's bounding box.
       height, width, _ = annotated_image.shape
       x_coordinates = [landmark.x for landmark in hand_landmarks]
       y_coordinates = [landmark.y for landmark in hand_landmarks]
