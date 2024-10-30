@@ -9,13 +9,13 @@ from time import sleep
 from matplotlib import pyplot as plt
 from mediapipe.framework.formats import landmark_pb2
 from mediapipe import solutions
-import requests
 import numpy as np
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 from datetime import datetime
 import shutil
-import gestures
+import json
+
 
 class Recognition:
   def __init__(self, task_file_path: str, config_file_path: str):
@@ -44,6 +44,7 @@ class Recognition:
 
       self.__camera = 0
       self.__labels = self.__extract_labels(task_file_path)
+      self.__labels_with_alias = self.__alias_labels(self.__labels)
       self.confidence = 0.9
 
   @property
@@ -60,6 +61,10 @@ class Recognition:
   @property
   def labels(self):
     return self.__labels
+
+  @property
+  def labels_with_alias(self):
+    return self.__labels_with_alias
 
   def __extract_labels(self, path):
     # A kibontási könyvtár neve
@@ -91,6 +96,48 @@ class Recognition:
 
     shutil.rmtree(extract_to)
     return retlist
+
+  def __alias_labels(self, labels):
+    readable = {
+        "None": "",
+        "2up": "mutatás felfelé két ujjal",
+        "2down": "mutatás lefelé két ujjal",
+        "2left": "mutatás balra két ujjal",
+        "2right": "mutatás jobbra két ujjal",
+        "drei_glaser": "három",
+        "peace": "csao",
+        "2Metal": "metálvilla",
+        "long_life": "hosszú élet",
+        "fist": "ökölpacsi",
+        "like": "tetszik",
+        "perfect": "tökéletes",
+        "middle_finger": "középső ujj",
+        "fityisz": "fityisz",
+        "F": "F",
+        "CLOSEDPALM" : "Zárt tenyér",
+        "OPENPALM" : "Nyitott tenyér",
+        "THUMBSUP" : "Hüvelykujj fel",
+        "THUMBSDOWN" : "Hüvelykujj le",
+        "PEACE": "Béke",
+        "OK": "OK",
+        "LONGLIVE": "Hosszú élet (STAR TREK)"
+
+    }
+
+    gest_dict = {}
+    for label in labels:
+        if label in readable:
+            gest_dict[label] = readable[label]
+        else:
+            gest_dict[label] = "Unknown"
+
+    try:
+        with open('GUI/gestures.json', 'w', encoding='utf-8') as file:
+            json.dump(gest_dict, file, ensure_ascii=False, indent=4)
+    except Exception as e:
+        print(f"Error writing to gestures.json: {e}")
+
+    return gest_dict
 
   def draw_landmarks_on_image(self, rgb_image, detection_result):
     hand_landmarks_list = detection_result.hand_landmarks
@@ -172,11 +219,11 @@ class Recognition:
 if __name__ == '__main__':
   taskFile = "gesture_recognizer.task"
   recognizer = Recognition("gesture_recognizer.task", "gesture_recognition.config")
-  print(recognizer.camera)
-  print(recognizer.labels)
-  gestures.createGestures(recognizer.labels,taskFile)
+  #print(recognizer.camera)
+  #print(recognizer.labels)
+  print(recognizer.labels_with_alias)
   recognizer.confidence = 0.7
-  recognizer.Run()
+  #recognizer.Run()
 
 
   
