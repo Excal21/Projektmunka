@@ -1,18 +1,20 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 import sys
 import style
-import preferences
 import json
 import webbrowser
+import gesture_detection as gd
 import settings
 
-selected_prefs = []
-possible_commands = ["","Ctrl+C", "Ctrl+V", "Böngésző megnyitása", "fényerő növelése", "fényerő csökkentése"]
+global usedTaskFile
+usedTaskFile = "gesture_recognizer.task"
+recognizer = gd.Recognition(usedTaskFile)
+global selected_prefs
+selected_prefs = recognizer.labels_with_alias
+
+possible_commands = ["", "Ctrl+C", "Ctrl+V", "Böngésző megnyitása", "fényerő növelése", "fényerő csökkentése"]
 
 class Ui_MainWindow(object):
-    global usedTaskFile
-    usedTaskFile = ""
-    
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
@@ -94,14 +96,8 @@ class Ui_MainWindow(object):
 
         # Create the settings window instance here
         self.settingsWindow = QtWidgets.QMainWindow()
-        self.ui_settings = settings.Ui_settingsWindow()
+        self.ui_settings = settings.Ui_settingsWindow(selected_prefs)
         self.ui_settings.setupUi(self.settingsWindow)
-        self.ui_settings.taskFileUpdated.connect(self.updateUsedTaskFile)
-    
-    def updateUsedTaskFile(self, task_file):
-        global usedTaskFile
-        usedTaskFile = task_file
-        print(f"Updated usedTaskFile: {usedTaskFile}")
     
     def startRecognition(self):
         try:
@@ -109,7 +105,6 @@ class Ui_MainWindow(object):
                 data = json.load(file)
                 global usedTaskFile
                 if data:  # Check if data is not empty
-                    print("hasznalt .task fajl: ", usedTaskFile)
                     camFeed = data.get('camFeed')
                     sensitivity = data.get('sensitivity')
                     ipAddress = data.get('ip_address', None)  # Use get method with default value
@@ -117,10 +112,12 @@ class Ui_MainWindow(object):
                     if self.pushButton.text() == "Használat":
                         self.pushButton.setText("megállítás")  # Change button text to "megállítás"
                         self.pushButton_2.setEnabled(False)  # Disable pushButton_2
+
                     else:
                         self.pushButton.setText("Használat")  # Change button text back to "Használat"
                         self.pushButton_2.setEnabled(True)  # Enable pushButton_2
         except Exception as e:
+            print(f"Error in startRecognition: {e}")
             message = QtWidgets.QMessageBox()
             message.setWindowTitle("Hiba")
             message.setText("Nincs kiválasztott fájl!")
@@ -129,8 +126,8 @@ class Ui_MainWindow(object):
             return
         
     def openSettings(self):
-        self.ui_settings.setTaskFile(usedTaskFile)
         self.settingsWindow.show()
+
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -141,7 +138,7 @@ class Ui_MainWindow(object):
         self.label_3.setText(_translate("MainWindow", style.projectDescription()))
         open('preferences.json', 'w').close()
     
-if __name__ == "__main__":
+if __name__ == "__main__": 
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()

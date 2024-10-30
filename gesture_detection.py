@@ -18,7 +18,7 @@ import json
 
 
 class Recognition:
-  def __init__(self, task_file_path: str, config_file_path: str):
+  def __init__(self, task_file_path: str):
       self.MARGIN = 10  # pixels
       self.FONT_SIZE = 1
       self.FONT_THICKNESS = 1
@@ -129,13 +129,7 @@ class Recognition:
         if label in readable:
             gest_dict[label] = readable[label]
         else:
-            gest_dict[label] = "Unknown"
-
-    try:
-        with open('GUI/gestures.json', 'w', encoding='utf-8') as file:
-            json.dump(gest_dict, file, ensure_ascii=False, indent=4)
-    except Exception as e:
-        print(f"Error writing to gestures.json: {e}")
+            gest_dict[label] = label
 
     return gest_dict
 

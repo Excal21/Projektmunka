@@ -1,9 +1,12 @@
 {
-    "None": "fényerő növelése",
-    "2Metal": "",
-    "2left": "Böngésző megnyitása",
-    "2up": "",
-    "F": "",
-    "camFeed": true,
-    "sensitivity": "5"
+    "CLOSEDPALM": "",
+    "LONGLIVE": "",
+    "OK": "",
+    "OPENPALM": "",
+    "PEACE": "",
+    "THUMBSDOWN": "",
+    "THUMBSUP": "",
+    "ip_address": "",
+    "sensitivity": "5",
+    "camFeed": true
 }

@@ -1,8 +1,9 @@
 {
-    "None": "",
-    "2Metal": "metálvilla",
-    "2left": "mutatás balra két ujjal",
-    "2up": "mutatás felfelé két ujjal",
-    "F": "F",
-    "task": "gesture_recognizer.task"
+    "CLOSEDPALM": "Zárt tenyér",
+    "LONGLIVE": "Hosszú élet (STAR TREK)",
+    "OK": "OK",
+    "OPENPALM": "Nyitott tenyér",
+    "PEACE": "Béke",
+    "THUMBSDOWN": "Hüvelykujj le",
+    "THUMBSUP": "Hüvelykujj fel"
 }

@@ -1,19 +1,15 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtGui import QIntValidator
-
-import sys
 import style
-import preferences
-import json
-import webbrowser
 import main
+import json
 
 class Ui_settingsWindow(QtCore.QObject):
     taskFileUpdated = QtCore.pyqtSignal(str)
-
-    def __init__(self):
+    
+    def __init__(self, selected_prefs):
         super().__init__()
-        self.usedTaskFile = None  # Store the passed task file locally
+        self.selected_prefs = selected_prefs
 
     def setupUi(self, settingsWindow):
         settingsWindow.setObjectName("settingsWindow")
@@ -37,15 +33,6 @@ class Ui_settingsWindow(QtCore.QObject):
         self.label = QtWidgets.QLabel(parent=self.horizontalLayoutWidget)
         self.label.setObjectName("label")
         self.horizontalLayout.addWidget(self.label, 0, QtCore.Qt.AlignmentFlag.AlignHCenter)
-
-        # Button to open File Dialog
-        self.fileDialogButton = QtWidgets.QPushButton(self.horizontalLayoutWidget)
-        self.fileDialogButton.setObjectName("fileDialogButton")
-        self.fileDialogButton.setText("tallózás")
-        self.fileDialogButton.setStyleSheet(style.button())
-        self.fileDialogButton.clicked.connect(self.openFileDialog)
-        self.horizontalLayout.addWidget(self.fileDialogButton, 0, QtCore.Qt.AlignmentFlag.AlignHCenter)
-
         # Main content layout
         self.mainContentWidget = QtWidgets.QWidget(self.centralwidget)
         self.mainContentWidget.setGeometry(QtCore.QRect(30, 100, 840, 500))
@@ -53,7 +40,6 @@ class Ui_settingsWindow(QtCore.QObject):
 
         self.mainContentLayout = QtWidgets.QHBoxLayout(self.mainContentWidget)
         self.mainContentLayout.setObjectName("mainContentLayout")
-
         # Create widgets to hold the grid layouts
         self.leftWidget = QtWidgets.QWidget(self.mainContentWidget)
         self.leftWidget.setObjectName("leftWidget")
@@ -65,7 +51,7 @@ class Ui_settingsWindow(QtCore.QObject):
         self.leftGrid.setObjectName("leftGrid")
         self.rightGrid = QtWidgets.QGridLayout(self.rightWidget)
         self.rightGrid.setObjectName("rightGrid")
-
+        self.addOptions()
         # Add the widgets to the main content layout
         self.mainContentLayout.addWidget(self.leftWidget)
         self.mainContentLayout.addWidget(self.rightWidget)
@@ -74,8 +60,7 @@ class Ui_settingsWindow(QtCore.QObject):
         self.saveButton.setObjectName("saveButton")
         self.saveButton.setText("Mentés")
         self.saveButton.setGeometry(QtCore.QRect(30, 600, 731, 80))
-        self.saveButton.setEnabled(False)
-        self.saveButton.setVisible(False)
+        self.saveButton.clicked.connect(self.savePreferences)
         settingsWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(settingsWindow)
@@ -85,36 +70,6 @@ class Ui_settingsWindow(QtCore.QObject):
         _translate = QtCore.QCoreApplication.translate
         settingsWindow.setWindowTitle(_translate("settingsWindow", "Beállítások"))
         self.label.setText(_translate("settingsWindow", "JSON fájl kiválasztása"))
-
-    def openFileDialog(self):
-        fileName, _ = QtWidgets.QFileDialog.getOpenFileName(
-            parent=self.centralwidget,  # Parent set to centralwidget for better modality
-            caption="Select JSON File",
-            directory="",  # Initial directory
-            filter="JSON Files (*.json);;All Files (*)",  # File types filter
-        )
-        if fileName:
-            try:
-                with open(fileName, 'r', encoding='utf-8') as file:
-                    data = json.load(file)
-                    if isinstance(data, dict):
-                        self.usedTaskFile = data.get("task")
-                        data.pop("task", None)  # Remove "task" key if it exists
-                        main.selected_prefs.append(data)
-                        self.addOptions()
-                        self.sendTaskFileToMain()
-                    else:
-                        message = QtWidgets.QMessageBox()
-                        message.setWindowTitle("Error")
-                        message.setText("A JSON fájl nem tartalmazza a megfelelő adatokat!")
-                        message.setIcon(QtWidgets.QMessageBox.Icon.Warning)
-                        message.exec()
-            except Exception as e:
-                message = QtWidgets.QMessageBox()
-                message.setWindowTitle("Error")
-                message.setText(f"Hiba a JSON fájl beolvasása közben: {e}")
-                message.setIcon(QtWidgets.QMessageBox.Icon.Critical)
-                message.exec()
 
     def addOptions(self):
         # Clear existing widgets in the grids if needed
@@ -142,7 +97,7 @@ class Ui_settingsWindow(QtCore.QObject):
 
         # Add dynamic options based on selected_prefs
         row = 1
-        for gesture, description in main.selected_prefs[0].items():
+        for gesture, description in self.selected_prefs.items():
             gestureLabel = QtWidgets.QLabel(parent=self.leftWidget)
             gestureLabel.setObjectName(f"{gesture}RadioButton")
             gestureLabel.setText(description)
@@ -215,27 +170,30 @@ class Ui_settingsWindow(QtCore.QObject):
         self.camFeedCheckBox.setChecked(True)
         self.rightGrid.addWidget(self.camFeedCheckBox, row, 0, 1, 1)
         row += 1
-
-        self.saveButton.setVisible(True)
-        self.saveButton.clicked.connect(self.savePreferences)
-        self.saveButton.setEnabled(True)
     
     def savePreferences(self):
         selected_choices = self.getComboBoxChoices()
         ipAddress = self.ipInput.text()
         sensitivity = self.sensitivityInput.text()
         radioButton = self.camFeedCheckBox.isChecked()  # Correctly get the state of the radio button
+        settings = {}
+        settings.update(selected_choices)
+        settings['ip_address'] = ipAddress
+        settings['sensitivity'] = sensitivity
+        settings['camFeed'] = radioButton
+        with open('preferences.json', 'w', encoding='utf-8') as file:
+            json.dump(settings, file, indent=4)
         message = QtWidgets.QMessageBox()
         message.setWindowTitle("Sikeres mentés")
         message.setText("A beállítások sikeresen elmentve!")
         message.setIcon(QtWidgets.QMessageBox.Icon.Information)
         message.exec()
-        preferences.createPreferences(main.selected_prefs, selected_choices, ipAddress, radioButton, sensitivity)
-
+        
     def getComboBoxChoices(self):
-        choices = []
+        choices = {}
         for comboBox in self.comboBoxes:
-            choices.append(comboBox.currentText())
+            gesture = comboBox.objectName().replace("ComboBox", "")
+            choices[gesture] = comboBox.currentText()
         return choices
     
     def updateComboBoxes(self):
@@ -246,13 +204,7 @@ class Ui_settingsWindow(QtCore.QObject):
         for comboBox in self.comboBoxes:
             for index in range(comboBox.count()):
                 item_text = comboBox.itemText(index)
-                if item_text in selected_items and item_text != comboBox.currentText() and item_text!="":
+                if item_text in selected_items and item_text != comboBox.currentText() and item_text != "":
                     comboBox.model().item(index).setEnabled(False)
                 else:
                     comboBox.model().item(index).setEnabled(True)
-
-    def sendTaskFileToMain(self):
-        self.taskFileUpdated.emit(self.usedTaskFile)
-
-    def setTaskFile(self, task_file):
-        self.usedTaskFile = task_file
