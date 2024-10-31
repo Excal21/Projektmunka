@@ -1,3 +1,4 @@
+import threading
 from PyQt6 import QtCore, QtGui, QtWidgets
 import sys
 import style
@@ -108,12 +109,14 @@ class Ui_MainWindow(object):
                     camFeed = data.get('camFeed')
                     sensitivity = data.get('sensitivity')
                     ipAddress = data.get('ip_address', None)  # Use get method with default value
-
+                    x = None
                     if self.pushButton.text() == "Használat":
+                        x = threading.Thread(target=recognizer.Run, args=())
+                        x.start()
                         self.pushButton.setText("megállítás")  # Change button text to "megállítás"
                         self.pushButton_2.setEnabled(False)  # Disable pushButton_2
-
                     else:
+                        recognizer.Stop()
                         self.pushButton.setText("Használat")  # Change button text back to "Használat"
                         self.pushButton_2.setEnabled(True)  # Enable pushButton_2
         except Exception as e:

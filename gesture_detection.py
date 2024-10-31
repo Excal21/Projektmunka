@@ -46,6 +46,7 @@ class Recognition:
       self.__labels = self.__extract_labels(task_file_path)
       self.__labels_with_alias = self.__alias_labels(self.__labels)
       self.confidence = 0.9
+      self.__stop = False
 
   @property
   def camera(self):
@@ -168,12 +169,13 @@ class Recognition:
     return annotated_image
 
   def Run(self):
+    self.__stop = False
     cap = cv2.VideoCapture(self.__camera)
     last_gestures = []
     last_gesture_time = datetime.now()
 
 
-    while True: 
+    while not self.__stop: 
       #Beépített kamera
       ret, img = cap.read()
       img = cv2.flip(img, 1)
@@ -184,7 +186,7 @@ class Recognition:
       
       #Kilépés ESC gombra
       if cv2.waitKey(1) == 27: 
-          break
+          self.__stop = True
       mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=img)
 
       result = self.recognizer.recognize(mp_image)
@@ -208,7 +210,8 @@ class Recognition:
       cv2.imshow('Annotated Image', annotated_image)
 
     cv2.destroyAllWindows() 
-  
+  def Stop(self):
+    self.__stop = True
 
 if __name__ == '__main__':
   taskFile = "gesture_recognizer.task"
