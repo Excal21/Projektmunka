@@ -69,7 +69,7 @@ class Ui_settingsWindow(QtCore.QObject):
     def retranslateUi(self, settingsWindow):
         _translate = QtCore.QCoreApplication.translate
         settingsWindow.setWindowTitle(_translate("settingsWindow", "Beállítások"))
-        self.label.setText(_translate("settingsWindow", "JSON fájl kiválasztása"))
+        self.label.setText(_translate("settingsWindow", "Gesztusvezérlés beállításai"))
 
     def addOptions(self):
         # Clear existing widgets in the grids if needed
@@ -178,7 +178,7 @@ class Ui_settingsWindow(QtCore.QObject):
         radioButton = self.camFeedCheckBox.isChecked()  # Correctly get the state of the radio button
         settings = {}
         settings.update(selected_choices)
-        settings['ip_address'] = ipAddress
+        settings['ip_address'] = ipAddress if ipAddress != "" else 0
         settings['sensitivity'] = sensitivity
         settings['camFeed'] = radioButton
         with open('preferences.json', 'w', encoding='utf-8') as file:

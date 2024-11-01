@@ -110,6 +110,7 @@ class Ui_MainWindow(object):
                     sensitivity = data.get('sensitivity')
                     ipAddress = data.get('ip_address', None)  # Use get method with default value
                     x = None
+                    recognizer.camera = ipAddress
                     if self.pushButton.text() == "Használat":
                         x = threading.Thread(target=recognizer.Run, args=())
                         x.start()

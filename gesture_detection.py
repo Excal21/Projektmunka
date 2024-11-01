@@ -55,7 +55,7 @@ class Recognition:
   @camera.setter
   def camera(self, value):
     if type(value) is str:
-      self.__camera = value + '/video'
+      self.__camera = 'https://' + value + ':8080/video'
     else:
       self.__camera = value
 
@@ -215,12 +215,13 @@ class Recognition:
 
 if __name__ == '__main__':
   taskFile = "gesture_recognizer.task"
-  recognizer = Recognition("gesture_recognizer.task", "gesture_recognition.config")
+  recognizer = Recognition("gesture_recognizer.task")
   #print(recognizer.camera)
   #print(recognizer.labels)
   print(recognizer.labels_with_alias)
   recognizer.confidence = 0.7
-  #recognizer.Run()
+  recognizer.camera = '192.168.1.12'
+  recognizer.Run()
 
 
   
