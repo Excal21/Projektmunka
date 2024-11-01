@@ -111,6 +111,12 @@ class Ui_MainWindow(object):
                     ipAddress = data.get('ip_address', None)  # Use get method with default value
                     x = None
                     recognizer.camera = ipAddress
+                    gesture_dict = {}
+                    # Read key-value pairs from data and store them in gesture_dict
+                    for key, value in data.items():
+                        gesture_dict[key] = value
+                    recognizer.commands = gesture_dict
+                    #recognizer.confidence = sensitivity
                     if self.pushButton.text() == "Használat":
                         x = threading.Thread(target=recognizer.Run, args=())
                         x.start()

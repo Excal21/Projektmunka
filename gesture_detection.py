@@ -47,6 +47,7 @@ class Recognition:
       self.__labels_with_alias = self.__alias_labels(self.__labels)
       self.confidence = 0.9
       self.__stop = False
+      self.__commands = {}
 
   @property
   def camera(self):
@@ -55,7 +56,7 @@ class Recognition:
   @camera.setter
   def camera(self, value):
     if type(value) is str:
-      self.__camera = 'https://' + value + ':8080/video'
+      self.__camera = 'http://' + value + ':8080/video'
     else:
       self.__camera = value
 
@@ -66,6 +67,13 @@ class Recognition:
   @property
   def labels_with_alias(self):
     return self.__labels_with_alias
+
+  @property
+  def commands(self):
+    return self.__commands
+  @commands.setter
+  def commands(self, value):
+    self.__commands = value
 
   def __extract_labels(self, path):
     # A kibontási könyvtár neve
@@ -133,6 +141,17 @@ class Recognition:
             gest_dict[label] = label
 
     return gest_dict
+  def __Execute(self, command):
+    what_to_do ={
+      "Ctrl+C": lambda: print("Ctrl+C"),
+      "Ctrl+V": lambda: print("Ctrl+V"),
+      "Böngésző megnyitása": lambda: print("Böngésző megnyitása"),
+      "fényerő növelése": lambda: print("fényerő növelése"),
+      "fényerő csökkentése": lambda: print("fényerő csökkentése")
+    }
+    if command in what_to_do:
+      what_to_do[command]()
+    
 
   def draw_landmarks_on_image(self, rgb_image, detection_result):
     hand_landmarks_list = detection_result.hand_landmarks
@@ -194,12 +213,14 @@ class Recognition:
         for gesture in result.gestures:
             if gesture[0].category_name != 'NONE' and gesture[0].category_name != '':
               if gesture[0].score > self.confidence:
-                print(f"{gesture[0].category_name} Confidence: {gesture[0].score:.2f}")
+          #      print(f"{gesture[0].category_name} Confidence: {gesture[0].score:.2f}")
                 last_gestures.append(gesture[0].category_name)
 
       if len(last_gestures) >= 7:
         if all(gesture == last_gestures[0] for gesture in last_gestures) and (datetime.now() - last_gesture_time).total_seconds() > 1 and last_gestures[0]  != '':
           print(last_gestures[0])
+          if last_gestures[0] in self.__commands:
+            self.__Execute(self.__commands[last_gestures[0]])
           last_gesture_time = datetime.now()
         last_gestures = []
           
