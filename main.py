@@ -146,7 +146,6 @@ class Ui_MainWindow(object):
         self.pushButton_2.setText(_translate("MainWindow", "Beállítások"))
         self.label.setText(_translate("MainWindow", "GestureMaster"))
         self.label_3.setText(_translate("MainWindow", style.projectDescription()))
-        open('preferences.json', 'w').close()
     
 if __name__ == "__main__": 
     app = QtWidgets.QApplication(sys.argv)

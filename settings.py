@@ -72,26 +72,35 @@ class Ui_settingsWindow(QtCore.QObject):
         self.label.setText(_translate("settingsWindow", "Gesztusvezérlés beállításai"))
 
     def addOptions(self):
+        preferences = {}
+        selected_settings = []
+        try:
+            with open('preferences.json', 'r', encoding='utf-8') as file:
+                preferences = json.load(file)
+            selected_settings = list(preferences.values())
+        except Exception:
+            pass
+
         # Clear existing widgets in the grids if needed
         for i in reversed(range(self.leftGrid.count())): 
             self.leftGrid.itemAt(i).widget().setParent(None)
         for i in reversed(range(self.rightGrid.count())): 
             self.rightGrid.itemAt(i).widget().setParent(None)
-        
+
         # Add gesture label
         self.gestureLabel = QtWidgets.QLabel(parent=self.leftWidget)
         self.gestureLabel.setObjectName("gestureLabel")
         self.gestureLabel.setText("Gesztus")
         self.leftGrid.addWidget(self.gestureLabel, 0, 0, 1, 1)
         self.gestureLabel.setStyleSheet(style.mainContentLabel())
-        
+
         # Add options label
         self.optionsLabel = QtWidgets.QLabel(parent=self.rightWidget)
         self.optionsLabel.setObjectName("optionsLabel")
         self.optionsLabel.setText("hozzárendelés")
         self.rightGrid.addWidget(self.optionsLabel, 0, 0, 1, 1)
         self.optionsLabel.setStyleSheet(style.mainContentLabel())
-    
+
         # Store combo boxes for later access
         self.comboBoxes = []
 
@@ -103,61 +112,74 @@ class Ui_settingsWindow(QtCore.QObject):
             gestureLabel.setText(description)
             gestureLabel.setStyleSheet(style.mainContentLabel())
             self.leftGrid.addWidget(gestureLabel, row, 0, 1, 1)
-            
+
             optionsComboBox = QtWidgets.QComboBox(parent=self.rightWidget)
             optionsComboBox.setObjectName(f"{gesture}ComboBox")
             optionsComboBox.addItems(main.possible_commands)
             optionsComboBox.setStyleSheet(style.dropDownMenu())
             self.rightGrid.addWidget(optionsComboBox, row, 0, 1, 1)
-            
+
+            # Set the current text if it exists
+            if row - 1 < len(selected_settings) and selected_settings[row - 1]:
+                optionsComboBox.setCurrentText(selected_settings[row - 1])
+
             # Connect the signal to a slot to handle option selection
             optionsComboBox.currentIndexChanged.connect(self.updateComboBoxes)
-            
+
             self.comboBoxes.append(optionsComboBox)
             row += 1
-        
+
         # Add sensitivity label and input
-        self.sensitivityLabel = QtWidgets.QLabel(parent=self.leftWidget) 
-        self.sensitivityLabel.setObjectName("sensitivityLabel")
-        self.sensitivityLabel.setText("Érzékenység")
-        self.leftGrid.addWidget(self.sensitivityLabel, row, 0, 1, 1)
-        self.sensitivityLabel.setStyleSheet(style.mainContentLabel())
-        
-        self.sensitivityInput = QtWidgets.QLineEdit(parent=self.rightWidget)
-        self.sensitivityInput.setObjectName("sensitivityInput")
-        self.sensitivityInput.setStyleSheet(style.dropDownMenu())
-        self.sensitivityInput.setPlaceholderText("1-25")
-        self.sensitivityInput.setText("5")
-        self.sensitivityInput.setSizeIncrement(1, 1)
-
-        # Set the validator to only allow integers between 1 and 25
-        int_validator = QIntValidator(1, 25)
-        self.sensitivityInput.setValidator(int_validator)
-
-        self.rightGrid.addWidget(self.sensitivityInput, row, 0, 1, 1)
-        row += 1
-
-        # Add IP label and input
         self.IPlabel = QtWidgets.QLabel(parent=self.leftWidget)
         self.IPlabel.setObjectName("IPlabel")
         self.IPlabel.setStyleSheet(style.mainContentLabel())
         self.IPlabel.setText("IP cím (ha üres, alapértelmezett kamerát használja)")
         self.leftGrid.addWidget(self.IPlabel, row, 0, 1, 1) 
-        
+
         self.ipInput = QtWidgets.QLineEdit(parent=self.rightWidget)
         self.ipInput.setObjectName("ipInput")
         self.ipInput.setStyleSheet(style.dropDownMenu())
         self.ipInput.setPlaceholderText("255.255.255.255")
-        # Use QRegularExpressionValidator with a more precise regular expression for IP addresses
+        self.rightGrid.addWidget(self.ipInput, row, 0, 1, 1)
+        # Use QRegularExpressionValidator for IP address
         ip_validator = QtGui.QRegularExpressionValidator(QtCore.QRegularExpression(
             r"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
         ))
         self.ipInput.setValidator(ip_validator)
+        if row - 1 < len(selected_settings) and selected_settings[row - 1]:
+            self.ipInput.setText(selected_settings[row - 1])
 
-        self.rightGrid.addWidget(self.ipInput, row, 0, 1, 1)
+        # Set IP input text if available
+        
         row += 1
 
-        # Add camera feed label and radio button
+        # sensitivity label and input
+
+        self.sensitivityLabel = QtWidgets.QLabel(parent=self.leftWidget) 
+        self.sensitivityLabel.setObjectName("sensitivityLabel")
+        self.sensitivityLabel.setText("Érzékenység")
+        self.leftGrid.addWidget(self.sensitivityLabel, row, 0, 1, 1)
+        self.sensitivityLabel.setStyleSheet(style.mainContentLabel())
+
+        self.sensitivityInput = QtWidgets.QLineEdit(parent=self.rightWidget)
+        self.sensitivityInput.setObjectName("sensitivityInput")
+        self.sensitivityInput.setStyleSheet(style.dropDownMenu())
+        self.sensitivityInput.setPlaceholderText("1-25")
+
+        # Set sensitivity input text if available
+        if row - 1 < len(selected_settings) and selected_settings[row - 1]:
+            self.sensitivityInput.setText(str(selected_settings[row - 1]))
+
+
+        self.sensitivityInput.setSizeIncrement(1, 1)
+
+        # Set the validator to only allow integers between 1 and 25
+        int_validator = QIntValidator(1, 25)
+        self.sensitivityInput.setValidator(int_validator)
+        self.rightGrid.addWidget(self.sensitivityInput, row, 0, 1, 1)
+        row += 1
+
+        # Add camera feed label and checkbox
         self.camFeedLabel = QtWidgets.QLabel(parent=self.leftWidget)
         self.camFeedLabel.setObjectName("camFeedLabel") 
         self.camFeedLabel.setText("Kamerakép?")
@@ -169,7 +191,7 @@ class Ui_settingsWindow(QtCore.QObject):
         self.camFeedCheckBox.setStyleSheet(style.dropDownMenu())
         self.camFeedCheckBox.setChecked(True)
         self.rightGrid.addWidget(self.camFeedCheckBox, row, 0, 1, 1)
-        row += 1
+
     
     def savePreferences(self):
         selected_choices = self.getComboBoxChoices()
