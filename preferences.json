@@ -1,11 +1,11 @@
 {
-    "CLOSEDPALM": "Ctrl+C",
-    "LONGLIVE": "",
-    "OK": "",
-    "OPENPALM": "",
-    "PEACE": "",
-    "THUMBSDOWN": "",
-    "THUMBSUP": "",
+    "Closed_Fist": "Ctrl+C",
+    "Open_Palm": "f\u00e9nyer\u0151 cs\u00f6kkent\u00e9se",
+    "Pointing_Up": "",
+    "Thumb_Down": "",
+    "Thumb_Up": "",
+    "Victory": "",
+    "ILoveYou": "",
     "ip_address": 0,
     "sensitivity": "",
     "camFeed": true

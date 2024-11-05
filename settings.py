@@ -59,9 +59,17 @@ class Ui_settingsWindow(QtCore.QObject):
         self.saveButton.setStyleSheet(style.button())
         self.saveButton.setObjectName("saveButton")
         self.saveButton.setText("Mentés")
-        self.saveButton.setGeometry(QtCore.QRect(30, 600, 731, 80))
+        self.saveButton.setGeometry(QtCore.QRect(30, 600, 650, 80))
         self.saveButton.clicked.connect(self.savePreferences)
+        #reset settings button
+        self.resetButton = QtWidgets.QPushButton(self.centralwidget)
+        self.resetButton.setStyleSheet(style.button())
+        self.resetButton.setObjectName("resetButton")
+        self.resetButton.setText("reset")
+        self.resetButton.clicked.connect(self.resetPreferences)
+        self.resetButton.setGeometry(QtCore.QRect(700, 600, 80, 80))
         settingsWindow.setCentralWidget(self.centralwidget)
+
 
         self.retranslateUi(settingsWindow)
         QtCore.QMetaObject.connectSlotsByName(settingsWindow)
@@ -230,3 +238,24 @@ class Ui_settingsWindow(QtCore.QObject):
                     comboBox.model().item(index).setEnabled(False)
                 else:
                     comboBox.model().item(index).setEnabled(True)
+    def resetPreferences(self):
+        message = QtWidgets.QMessageBox()
+        message.setWindowTitle("Beállítások törlése")
+        message.setText("Biztosan törölni szeretné a beállításokat?")
+        message.setIcon(QtWidgets.QMessageBox.Icon.Question)
+        message.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+        message.setDefaultButton(QtWidgets.QMessageBox.StandardButton.No)
+
+        response = message.exec()
+
+        if response == QtWidgets.QMessageBox.StandardButton.Yes:
+            with open('preferences.json', 'w', encoding='utf-8') as file:
+                json.dump({}, file, indent=4)
+            message = QtWidgets.QMessageBox()
+            message.setWindowTitle("Sikeres törlés")
+            message.setText("A beállítások sikeresen törölve!")
+            message.setIcon(QtWidgets.QMessageBox.Icon.Question)
+            message.exec()
+            self.addOptions()
+        else:
+            return

@@ -45,7 +45,7 @@ class Recognition:
       self.__camera = 0
       self.__labels = self.__extract_labels(task_file_path)
       self.__labels_with_alias = self.__alias_labels(self.__labels)
-      self.confidence = 0.9
+      self.confidence = 0.7
       self.__stop = False
       self.__commands = {}
 

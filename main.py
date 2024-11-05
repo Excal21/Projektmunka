@@ -12,7 +12,8 @@ usedTaskFile = "gesture_recognizer.task"
 recognizer = gd.Recognition(usedTaskFile)
 global selected_prefs
 selected_prefs = recognizer.labels_with_alias
-
+if 'None' or ''or'none' in selected_prefs:
+    selected_prefs.pop('None')
 possible_commands = ["", "Ctrl+C", "Ctrl+V", "Böngésző megnyitása", "fényerő növelése", "fényerő csökkentése"]
 
 class Ui_MainWindow(object):
@@ -122,6 +123,7 @@ class Ui_MainWindow(object):
                         x.start()
                         self.pushButton.setText("megállítás")  # Change button text to "megállítás"
                         self.pushButton_2.setEnabled(False)  # Disable pushButton_2
+                        
                     else:
                         recognizer.Stop()
                         self.pushButton.setText("Használat")  # Change button text back to "Használat"
