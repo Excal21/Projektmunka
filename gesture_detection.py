@@ -15,6 +15,7 @@ from mediapipe.tasks.python import vision
 from datetime import datetime
 import shutil
 import json
+import pyautogui
 
 
 class Recognition:
@@ -45,9 +46,12 @@ class Recognition:
       self.__camera = 0
       self.__labels = self.__extract_labels(task_file_path)
       self.__labels_with_alias = self.__alias_labels(self.__labels)
-      self.confidence = 0.7
+      self.__confidence = 0.7
       self.__stop = False
       self.__commands = {}
+      self.__camerafeed = True
+
+
 
   @property
   def camera(self):
@@ -74,6 +78,23 @@ class Recognition:
   @commands.setter
   def commands(self, value):
     self.__commands = value
+
+  @property
+  def confidence(self):
+    return self.__confidence
+  @confidence.setter
+  def confidence(self, value):
+    if 1 <= value <= 25:
+      self.__confidence = 1 - (value / 25)
+    else:
+      self.__confidence = 0.5
+
+  @property
+  def camerafeed(self):
+    return self.__camerafeed
+  @camerafeed.setter
+  def camerafeed(self, value):
+    self.__camerafeed = value
 
   def __extract_labels(self, path):
     # A kibontási könyvtár neve
@@ -129,7 +150,14 @@ class Recognition:
         "THUMBSDOWN" : "Hüvelykujj le",
         "PEACE": "Béke",
         "OK": "OK",
-        "LONGLIVE": "Hosszú élet (STAR TREK)"
+        "LONGLIVE": "Hosszú élet (STAR TREK)",
+        "Closed_Fist": "Zárt ököl",
+        "Open_Palm": "Nyitott tenyér",
+        "Pointing_Up": "Felfelé mutatás",
+        "Thumb_Down": "Hüvelykujj le",
+        "Thumb_Up": "Hüvelykujj fel",
+        "Victory": "Győzelem jelzés",
+        "ILoveYou": "Szeretlek jelzés",
 
     }
 
@@ -143,11 +171,13 @@ class Recognition:
     return gest_dict
   def __Execute(self, command):
     what_to_do ={
-      "Ctrl+C": lambda: print("Ctrl+C"),
-      "Ctrl+V": lambda: print("Ctrl+V"),
-      "Böngésző megnyitása": lambda: print("Böngésző megnyitása"),
-      "fényerő növelése": lambda: print("fényerő növelése"),
-      "fényerő csökkentése": lambda: print("fényerő csökkentése")
+      "Ctrl+C": lambda: pyautogui.hotkey('ctrl', 'c'),
+      "Ctrl+V": lambda: pyautogui.hotkey('ctrl', 'v'),
+      "Böngésző megnyitása": lambda: os.system("start www.google.com"),
+      "Fényerő növelése": lambda: print("fényerő növelése"),
+      "Fényerő csökkentése": lambda: print("fényerő csökkentése"),
+      "Jobbra": lambda: pyautogui.press('right'),
+      "Balra": lambda: pyautogui.press('left')
     }
     if command in what_to_do:
       what_to_do[command]()
@@ -216,11 +246,12 @@ class Recognition:
           #      print(f"{gesture[0].category_name} Confidence: {gesture[0].score:.2f}")
                 last_gestures.append(gesture[0].category_name)
 
-      if len(last_gestures) >= 7:
+      if len(last_gestures) >= 5:
         if all(gesture == last_gestures[0] for gesture in last_gestures) and (datetime.now() - last_gesture_time).total_seconds() > 1 and last_gestures[0]  != '':
           print(last_gestures[0])
           if last_gestures[0] in self.__commands:
             self.__Execute(self.__commands[last_gestures[0]])
+            print("last_gesture: {0}, confidence: {1:2f}".format(last_gestures[0], gesture[0].score))
           last_gesture_time = datetime.now()
         last_gestures = []
           
@@ -228,7 +259,8 @@ class Recognition:
       annotated_image = self.draw_landmarks_on_image(mp_image.numpy_view(), result)
 
       annotated_image = cv2.cvtColor(annotated_image, cv2.COLOR_BGR2RGB)
-      cv2.imshow('Annotated Image', annotated_image)
+      if self.__camerafeed:
+        cv2.imshow('Annotated Image', annotated_image)
 
     cv2.destroyAllWindows() 
   def Stop(self):

@@ -1,12 +1,12 @@
 {
-    "Closed_Fist": "Ctrl+C",
+    "Closed_Fist": "",
     "Open_Palm": "f\u00e9nyer\u0151 cs\u00f6kkent\u00e9se",
     "Pointing_Up": "",
-    "Thumb_Down": "",
-    "Thumb_Up": "",
+    "Thumb_Down": "Balra",
+    "Thumb_Up": "Jobbra",
     "Victory": "",
-    "ILoveYou": "",
-    "ip_address": 0,
-    "sensitivity": "",
-    "camFeed": true
+    "ILoveYou": "B\u00f6ng\u00e9sz\u0151 megnyit\u00e1sa",
+    "ip_address": "192.168.77.92",
+    "sensitivity": "25",
+    "camFeed": false
 }

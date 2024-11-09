@@ -14,7 +14,7 @@ global selected_prefs
 selected_prefs = recognizer.labels_with_alias
 if 'None' or ''or'none' in selected_prefs:
     selected_prefs.pop('None')
-possible_commands = ["", "Ctrl+C", "Ctrl+V", "Böngésző megnyitása", "fényerő növelése", "fényerő csökkentése"]
+possible_commands = ["", "Ctrl+C", "Ctrl+V", "Böngésző megnyitása", "fényerő növelése", "fényerő csökkentése", "Jobbra", "Balra"]
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -117,7 +117,9 @@ class Ui_MainWindow(object):
                     for key, value in data.items():
                         gesture_dict[key] = value
                     recognizer.commands = gesture_dict
-                    #recognizer.confidence = sensitivity
+                    recognizer.confidence = int(sensitivity)
+                    recognizer.camerafeed = camFeed
+
                     if self.pushButton.text() == "Használat":
                         x = threading.Thread(target=recognizer.Run, args=())
                         x.start()
