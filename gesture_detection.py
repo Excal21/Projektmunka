@@ -9,15 +9,17 @@ from time import sleep
 from matplotlib import pyplot as plt
 from mediapipe.framework.formats import landmark_pb2
 from mediapipe import solutions
-import requests
 import numpy as np
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 from datetime import datetime
 import shutil
+import json
+import pyautogui
+
 
 class Recognition:
-  def __init__(self, task_file_path: str, config_file_path: str):
+  def __init__(self, task_file_path: str):
       self.MARGIN = 10  # pixels
       self.FONT_SIZE = 1
       self.FONT_THICKNESS = 1
@@ -43,7 +45,13 @@ class Recognition:
 
       self.__camera = 0
       self.__labels = self.__extract_labels(task_file_path)
-      self.confidence = 0.9
+      self.__labels_with_alias = self.__alias_labels(self.__labels)
+      self.__confidence = 0.7
+      self.__stop = False
+      self.__commands = {}
+      self.__camerafeed = True
+
+
 
   @property
   def camera(self):
@@ -52,13 +60,41 @@ class Recognition:
   @camera.setter
   def camera(self, value):
     if type(value) is str:
-      self.__camera = value + '/video'
+      self.__camera = 'http://' + value + ':8080/video'
     else:
       self.__camera = value
 
   @property
   def labels(self):
     return self.__labels
+
+  @property
+  def labels_with_alias(self):
+    return self.__labels_with_alias
+
+  @property
+  def commands(self):
+    return self.__commands
+  @commands.setter
+  def commands(self, value):
+    self.__commands = value
+
+  @property
+  def confidence(self):
+    return self.__confidence
+  @confidence.setter
+  def confidence(self, value):
+    if 1 <= value <= 25:
+      self.__confidence = 1 - (value / 25)
+    else:
+      self.__confidence = 0.5
+
+  @property
+  def camerafeed(self):
+    return self.__camerafeed
+  @camerafeed.setter
+  def camerafeed(self, value):
+    self.__camerafeed = value
 
   def __extract_labels(self, path):
     # A kibontási könyvtár neve
@@ -90,6 +126,62 @@ class Recognition:
 
     shutil.rmtree(extract_to)
     return retlist
+
+  def __alias_labels(self, labels):
+    readable = {
+        "None": "",
+        "2up": "mutatás felfelé két ujjal",
+        "2down": "mutatás lefelé két ujjal",
+        "2left": "mutatás balra két ujjal",
+        "2right": "mutatás jobbra két ujjal",
+        "drei_glaser": "három",
+        "peace": "csao",
+        "2Metal": "metálvilla",
+        "long_life": "hosszú élet",
+        "fist": "ökölpacsi",
+        "like": "tetszik",
+        "perfect": "tökéletes",
+        "middle_finger": "középső ujj",
+        "fityisz": "fityisz",
+        "F": "F",
+        "CLOSEDPALM" : "Zárt tenyér",
+        "OPENPALM" : "Nyitott tenyér",
+        "THUMBSUP" : "Hüvelykujj fel",
+        "THUMBSDOWN" : "Hüvelykujj le",
+        "PEACE": "Béke",
+        "OK": "OK",
+        "LONGLIVE": "Hosszú élet (STAR TREK)",
+        "Closed_Fist": "Zárt ököl",
+        "Open_Palm": "Nyitott tenyér",
+        "Pointing_Up": "Felfelé mutatás",
+        "Thumb_Down": "Hüvelykujj le",
+        "Thumb_Up": "Hüvelykujj fel",
+        "Victory": "Győzelem jelzés",
+        "ILoveYou": "Szeretlek jelzés",
+
+    }
+
+    gest_dict = {}
+    for label in labels:
+        if label in readable:
+            gest_dict[label] = readable[label]
+        else:
+            gest_dict[label] = label
+
+    return gest_dict
+  def __Execute(self, command):
+    what_to_do ={
+      "Ctrl+C": lambda: pyautogui.hotkey('ctrl', 'c'),
+      "Ctrl+V": lambda: pyautogui.hotkey('ctrl', 'v'),
+      "Böngésző megnyitása": lambda: os.system("start www.google.com"),
+      "Fényerő növelése": lambda: print("fényerő növelése"),
+      "Fényerő csökkentése": lambda: print("fényerő csökkentése"),
+      "Jobbra": lambda: pyautogui.press('right'),
+      "Balra": lambda: pyautogui.press('left')
+    }
+    if command in what_to_do:
+      what_to_do[command]()
+    
 
   def draw_landmarks_on_image(self, rgb_image, detection_result):
     hand_landmarks_list = detection_result.hand_landmarks
@@ -126,12 +218,13 @@ class Recognition:
     return annotated_image
 
   def Run(self):
+    self.__stop = False
     cap = cv2.VideoCapture(self.__camera)
     last_gestures = []
     last_gesture_time = datetime.now()
 
 
-    while True: 
+    while not self.__stop: 
       #Beépített kamera
       ret, img = cap.read()
       img = cv2.flip(img, 1)
@@ -142,7 +235,7 @@ class Recognition:
       
       #Kilépés ESC gombra
       if cv2.waitKey(1) == 27: 
-          break
+          self.__stop = True
       mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=img)
 
       result = self.recognizer.recognize(mp_image)
@@ -150,12 +243,15 @@ class Recognition:
         for gesture in result.gestures:
             if gesture[0].category_name != 'NONE' and gesture[0].category_name != '':
               if gesture[0].score > self.confidence:
-                print(f"{gesture[0].category_name} Confidence: {gesture[0].score:.2f}")
+          #      print(f"{gesture[0].category_name} Confidence: {gesture[0].score:.2f}")
                 last_gestures.append(gesture[0].category_name)
 
-      if len(last_gestures) >= 7:
+      if len(last_gestures) >= 5:
         if all(gesture == last_gestures[0] for gesture in last_gestures) and (datetime.now() - last_gesture_time).total_seconds() > 1 and last_gestures[0]  != '':
           print(last_gestures[0])
+          if last_gestures[0] in self.__commands:
+            self.__Execute(self.__commands[last_gestures[0]])
+            print("last_gesture: {0}, confidence: {1:2f}".format(last_gestures[0], gesture[0].score))
           last_gesture_time = datetime.now()
         last_gestures = []
           
@@ -163,17 +259,21 @@ class Recognition:
       annotated_image = self.draw_landmarks_on_image(mp_image.numpy_view(), result)
 
       annotated_image = cv2.cvtColor(annotated_image, cv2.COLOR_BGR2RGB)
-      cv2.imshow('Annotated Image', annotated_image)
+      if self.__camerafeed:
+        cv2.imshow('Annotated Image', annotated_image)
 
     cv2.destroyAllWindows() 
-  
+  def Stop(self):
+    self.__stop = True
 
 if __name__ == '__main__':
-  recognizer = Recognition("gesture_recognizer.task", "gesture_recognition.config")
-  print(recognizer.camera)
-  print(recognizer.labels)
-
+  taskFile = "gesture_recognizer.task"
+  recognizer = Recognition("gesture_recognizer.task")
+  #print(recognizer.camera)
+  #print(recognizer.labels)
+  print(recognizer.labels_with_alias)
   recognizer.confidence = 0.7
+  recognizer.camera = '192.168.1.12'
   recognizer.Run()
 
 
