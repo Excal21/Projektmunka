@@ -12,3 +12,4 @@ __pycache__
 gesture_recognizer*.task
 info.txt
 demo.py
+preferences.json
