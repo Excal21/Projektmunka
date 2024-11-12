@@ -164,7 +164,7 @@ class Ui_settingsWindow(QtCore.QObject):
         # sensitivity label and input
         self.sensitivityLabel= QtWidgets.QLabel(parent=self.leftWidget)
         self.sensitivityLabel.setObjectName("sensitivityLabel")
-        self.sensitivityLabel.setText("felismerés minimális érzékenyésge (%)")
+        self.sensitivityLabel.setText("Felismerés minimális érzékenyésge (%)")
         self.sensitivityLabel.setStyleSheet(style.mainContentLabel())
         self.leftGrid.addWidget(self.sensitivityLabel, row, 0, 1, 1)
         
@@ -180,7 +180,7 @@ class Ui_settingsWindow(QtCore.QObject):
         row += 1
         self.frameCountLabel = QtWidgets.QLabel(parent=self.leftWidget) 
         self.frameCountLabel.setObjectName("frameCountLabel")
-        self.frameCountLabel.setText("minimális felismerések száma")
+        self.frameCountLabel.setText("Képkockaszám")
         self.leftGrid.addWidget(self.frameCountLabel, row, 0, 1, 1)
         self.frameCountLabel.setStyleSheet(style.mainContentLabel())
 
@@ -229,7 +229,7 @@ class Ui_settingsWindow(QtCore.QObject):
         settings.update(selected_choices)
         settings['ip_address'] = ipAddress if ipAddress != "" else 0
         settings['sensitivity'] = sensitivity
-        settings['frameCount'] = frameCount
+        settings['frameCount'] = int(frameCount)
         settings['camFeed'] = radioButton
         with open('preferences.json', 'w', encoding='utf-8') as file:
             json.dump(settings, file, indent=4)
