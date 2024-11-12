@@ -67,7 +67,7 @@ class Ui_settingsWindow(QtCore.QObject):
         self.resetButton.setObjectName("resetButton")
         self.resetButton.setText("reset")
         self.resetButton.clicked.connect(self.resetPreferences)
-        self.resetButton.setGeometry(QtCore.QRect(700, 600, 80, 80))
+        self.resetButton.setGeometry(QtCore.QRect(700, 600, 150, 80))
         settingsWindow.setCentralWidget(self.centralwidget)
 
 

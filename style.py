@@ -19,14 +19,14 @@ def hasbara():
 def dropDownMenu():
     return """
     QLineEdit {
-        font-size: 16pt;
+        font-size: 12pt;
         background-color: #385b7d;
         border-radius: 5px;
         height: 30px;
     }
     QCheckBox {
         color: #385b7d;
-        padding: 6px;
+        margin: 12px;
     }
     QComboBox {
         font-size: 12pt;
@@ -34,18 +34,15 @@ def dropDownMenu():
         border-radius: 5px;
         height: 30px;
     }
-    QComboBox::down-arrow {
-        height: 10px;
-        border-radius: 3px;
-
-    }
     QComboBox QAbstractItemView::item:first {
         color: gray;
+        
     }
     QSpinBox {
         border-radius: 5px;
-        height: 35px;
+        height: 30px;
         background-color: #385b7d;
+        font-size: 12pt;
     }
     """
 
