@@ -42,6 +42,11 @@ def dropDownMenu():
     QComboBox QAbstractItemView::item:first {
         color: gray;
     }
+    QSpinBox {
+        border-radius: 5px;
+        height: 35px;
+        background-color: #385b7d;
+    }
     """
 
 def contacts(): 

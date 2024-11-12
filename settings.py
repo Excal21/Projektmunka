@@ -137,7 +137,7 @@ class Ui_settingsWindow(QtCore.QObject):
             self.comboBoxes.append(optionsComboBox)
             row += 1
 
-        # Add sensitivity label and input
+        # Add frameCount label and input
         self.IPlabel = QtWidgets.QLabel(parent=self.leftWidget)
         self.IPlabel.setObjectName("IPlabel")
         self.IPlabel.setStyleSheet(style.mainContentLabel())
@@ -162,30 +162,47 @@ class Ui_settingsWindow(QtCore.QObject):
         row += 1
 
         # sensitivity label and input
-
-        self.sensitivityLabel = QtWidgets.QLabel(parent=self.leftWidget) 
+        self.sensitivityLabel= QtWidgets.QLabel(parent=self.leftWidget)
         self.sensitivityLabel.setObjectName("sensitivityLabel")
-        self.sensitivityLabel.setText("Érzékenység")
-        self.leftGrid.addWidget(self.sensitivityLabel, row, 0, 1, 1)
+        self.sensitivityLabel.setText("felismerés minimális érzékenyésge (%)")
         self.sensitivityLabel.setStyleSheet(style.mainContentLabel())
-
-        self.sensitivityInput = QtWidgets.QLineEdit(parent=self.rightWidget)
+        self.leftGrid.addWidget(self.sensitivityLabel, row, 0, 1, 1)
+        
+        self.sensitivityInput = QtWidgets.QSpinBox(parent=self.rightWidget)
         self.sensitivityInput.setObjectName("sensitivityInput")
         self.sensitivityInput.setStyleSheet(style.dropDownMenu())
-        self.sensitivityInput.setPlaceholderText("1-25")
-
-        # Set sensitivity input text if available
-        if row - 1 < len(selected_settings) and selected_settings[row - 1]:
-            self.sensitivityInput.setText(str(selected_settings[row - 1]))
-
-
+        self.sensitivityInput.setRange(50, 95)
+        self.rightGrid.addWidget(self.sensitivityInput, row, 0, 1, 1)
         self.sensitivityInput.setSizeIncrement(1, 1)
+        if row - 1 < len(selected_settings) and selected_settings[row - 1]:
+            self.sensitivityInput.setValue(int(selected_settings[row - 1]))
+        # Use QRegularExpressionValidator for sensitivity input
+        row += 1
+        self.frameCountLabel = QtWidgets.QLabel(parent=self.leftWidget) 
+        self.frameCountLabel.setObjectName("frameCountLabel")
+        self.frameCountLabel.setText("minimális felismerések száma")
+        self.leftGrid.addWidget(self.frameCountLabel, row, 0, 1, 1)
+        self.frameCountLabel.setStyleSheet(style.mainContentLabel())
+
+        self.frameCountInput = QtWidgets.QSpinBox(parent=self.rightWidget)
+        self.frameCountInput.setObjectName("frameCountInput")
+        self.frameCountInput.setStyleSheet(style.dropDownMenu())
+        self.frameCountInput.setRange(1, 25)
+        self.frameCountInput.setSizeIncrement(1, 1)
+        self.frameCountInput.setStepType(QtWidgets.QAbstractSpinBox.StepType.DefaultStepType)
+        self.rightGrid.addWidget(self.frameCountInput, row, 0, 1, 1)
+
+        # Set frameCount input text if available
+        if row - 1 < len(selected_settings) and selected_settings[row - 1]:
+            self.frameCountInput.setValue(int(selected_settings[row - 1]))
+
+
+        self.frameCountInput.setSizeIncrement(1, 1)
 
         # Set the validator to only allow integers between 1 and 25
-        int_validator = QIntValidator(1, 25)
-        self.sensitivityInput.setValidator(int_validator)
-        self.rightGrid.addWidget(self.sensitivityInput, row, 0, 1, 1)
+        self.rightGrid.addWidget(self.frameCountInput, row, 0, 1, 1)
         row += 1
+
 
         # Add camera feed label and checkbox
         self.camFeedLabel = QtWidgets.QLabel(parent=self.leftWidget)
@@ -202,14 +219,17 @@ class Ui_settingsWindow(QtCore.QObject):
 
     
     def savePreferences(self):
+
         selected_choices = self.getComboBoxChoices()
         ipAddress = self.ipInput.text()
-        sensitivity = self.sensitivityInput.text()
-        radioButton = self.camFeedCheckBox.isChecked()  # Correctly get the state of the radio button
+        frameCount = self.frameCountInput.text()
+        radioButton = self.camFeedCheckBox.isChecked()
+        sensitivity=self.sensitivityInput.text()    
         settings = {}
         settings.update(selected_choices)
         settings['ip_address'] = ipAddress if ipAddress != "" else 0
         settings['sensitivity'] = sensitivity
+        settings['frameCount'] = frameCount
         settings['camFeed'] = radioButton
         with open('preferences.json', 'w', encoding='utf-8') as file:
             json.dump(settings, file, indent=4)
