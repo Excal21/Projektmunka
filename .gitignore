@@ -13,3 +13,4 @@ gesture_recognizer*.task
 info.txt
 demo.py
 preferences.json
+*.pfx
