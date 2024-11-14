@@ -50,7 +50,14 @@ class Recognition:
       self.__stop = False
       self.__commands = {}
       self.__camerafeed = True
+      self.__framecount = 5
 
+  @property
+  def framecount(self):
+    return self.__framecount
+  @framecount.setter
+  def framecount(self, value):
+    self.__framecount = value
 
 
   @property
@@ -84,10 +91,7 @@ class Recognition:
     return self.__confidence
   @confidence.setter
   def confidence(self, value):
-    if 1 <= value <= 25:
-      self.__confidence = 1 - (value / 25)
-    else:
-      self.__confidence = 0.5
+    self.__confidence = value/100
 
   @property
   def camerafeed(self):
@@ -246,7 +250,7 @@ class Recognition:
           #      print(f"{gesture[0].category_name} Confidence: {gesture[0].score:.2f}")
                 last_gestures.append(gesture[0].category_name)
 
-      if len(last_gestures) >= 5:
+      if len(last_gestures) >= self.__framecount:
         if all(gesture == last_gestures[0] for gesture in last_gestures) and (datetime.now() - last_gesture_time).total_seconds() > 1 and last_gestures[0]  != '':
           print(last_gestures[0])
           if last_gestures[0] in self.__commands:

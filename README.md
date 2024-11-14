@@ -10,11 +10,6 @@ A felhasználó kezének felismerése és értelmezése a Google MediaPipe API s
 Bővebb információ: [Google MediaPipe API](https://ai.google.dev/edge/mediapipe/solutions/vision/gesture_recognizer)
 
 ## Csapattagok
-
-<p align="center">
-<img src="waving.gif" alt="Waving" style="width:50%;" align="right">
-</p>
-
 - Barszcz Dániel
 - Varga Balázs
 - Szakál Gyula Richárd (csapatvezető)

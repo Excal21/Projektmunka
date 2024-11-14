@@ -110,6 +110,7 @@ class Ui_MainWindow(object):
                     camFeed = data.get('camFeed')
                     sensitivity = data.get('sensitivity')
                     ipAddress = data.get('ip_address', None)  # Use get method with default value
+                    frameCount = data.get('frameCount')
                     x = None
                     recognizer.camera = ipAddress
                     gesture_dict = {}
@@ -119,6 +120,7 @@ class Ui_MainWindow(object):
                     recognizer.commands = gesture_dict
                     recognizer.confidence = int(sensitivity)
                     recognizer.camerafeed = camFeed
+                    recognizer.framecount = frameCount
 
                     if self.pushButton.text() == "Használat":
                         x = threading.Thread(target=recognizer.Run, args=())
