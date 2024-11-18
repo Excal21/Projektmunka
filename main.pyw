@@ -1,3 +1,4 @@
+import time
 import threading
 from PyQt6 import QtCore, QtGui, QtWidgets
 import sys
@@ -14,7 +15,33 @@ global selected_prefs
 selected_prefs = recognizer.labels_with_alias
 if 'None' or ''or'none' in selected_prefs:
     selected_prefs.pop('None')
-possible_commands = ["", "Ctrl+C", "Ctrl+V", "Böngésző megnyitása", "fényerő növelése", "fényerő csökkentése", "Jobbra", "Balra"]
+possible_commands = ["", "Ctrl+C", "Ctrl+V", "Böngésző megnyitása", "Jobbra", "Balra",
+                     "Asztal megjelenítése", "Számológép indítása", "Lejátszás/ megállítás", "Következő", "Előző",
+                     "Hangerő növelése", "Hangerő csökkentése"]
+
+
+class ThreadWithException(threading.Thread):
+    def __init__(self, *args, **kwargs):
+        super(ThreadWithException, self).__init__(*args, **kwargs)
+        self._exception = None
+
+    def run(self):
+        try:
+            if self._target:
+                self._target(*self._args, **self._kwargs)
+        except BaseException as e:
+            self._exception = e
+
+    def join_with_exception(self):
+        if self._exception:
+            raise self._exception
+
+
+def monitor_thread(thread):
+    while thread.is_alive():
+        time.sleep(1)
+    thread.join_with_exception()
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -122,24 +149,48 @@ class Ui_MainWindow(object):
                     recognizer.camerafeed = camFeed
                     recognizer.framecount = frameCount
 
+
                     if self.pushButton.text() == "Használat":
-                        x = threading.Thread(target=recognizer.Run, args=())
+                        x = ThreadWithException(target=recognizer.Run)
                         x.start()
+
+                        # Monitor the thread to catch exceptions
+                        monitor_thread_thread = threading.Thread(target=monitor_thread, args=(x,))
+                        monitor_thread_thread.start()
+
                         self.pushButton.setText("megállítás")  # Change button text to "megállítás"
                         self.pushButton_2.setEnabled(False)  # Disable pushButton_2
+                        time.sleep(1)
+                        if(x.is_alive and recognizer.error == True):
+                            recognizer.Stop()
+                            recognizer.error = False
+                            self.pushButton.setText("Használat")  # Change button text back to "Használat"
+                            self.pushButton_2.setEnabled(True)  # Enable pushButton_2
+                            raise ConnectionError
                         
+
                     else:
                         recognizer.Stop()
                         self.pushButton.setText("Használat")  # Change button text back to "Használat"
                         self.pushButton_2.setEnabled(True)  # Enable pushButton_2
+        except ConnectionError:
+            print("Error in startRecognition: ConnectionError")
+            message = QtWidgets.QMessageBox()
+            message.setWindowTitle("Hiba")
+            message.setText("Nem sikerült kapcsolódni a kameraához. Kérlek, ellenőrizd az IP címet!")
+            message.setIcon(QtWidgets.QMessageBox.Icon.Warning)
+            message.exec()
+            return
+
         except Exception as e:
             print(f"Error in startRecognition: {e}")
             message = QtWidgets.QMessageBox()
             message.setWindowTitle("Hiba")
-            message.setText("Nincs kiválasztott fájl!")
+            message.setText("Kérlek, add meg a gesztusvezérlés beállításait!")
             message.setIcon(QtWidgets.QMessageBox.Icon.Warning)
             message.exec()
             return
+        
         
     def openSettings(self):
         self.settingsWindow.show()

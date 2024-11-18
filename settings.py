@@ -59,7 +59,7 @@ class Ui_settingsWindow(QtCore.QObject):
         self.saveButton.setStyleSheet(style.button())
         self.saveButton.setObjectName("saveButton")
         self.saveButton.setText("Mentés")
-        self.saveButton.setGeometry(QtCore.QRect(30, 600, 650, 80))
+        self.saveButton.setGeometry(QtCore.QRect(30, 600, 650, 45))
         self.saveButton.clicked.connect(self.savePreferences)
         #reset settings button
         self.resetButton = QtWidgets.QPushButton(self.centralwidget)
@@ -67,7 +67,7 @@ class Ui_settingsWindow(QtCore.QObject):
         self.resetButton.setObjectName("resetButton")
         self.resetButton.setText("reset")
         self.resetButton.clicked.connect(self.resetPreferences)
-        self.resetButton.setGeometry(QtCore.QRect(700, 600, 150, 80))
+        self.resetButton.setGeometry(QtCore.QRect(700, 600, 150, 45))
         settingsWindow.setCentralWidget(self.centralwidget)
 
 

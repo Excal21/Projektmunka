@@ -11,7 +11,7 @@ def descLabelStyle():
     return "font: 20px \"Bahnschrift\"; text-align: justify; width: 400px; max-width: 350px;"
 
 def mainContentLabel():
-   return "text-align: center; max-height:100px;font-size: 20pt; height:30px"
+   return "text-align: center; max-height:100px;font-size: 15pt; height:30px"
 
 def hasbara():
     return "hasbara"
@@ -19,7 +19,7 @@ def hasbara():
 def dropDownMenu():
     return """
     QLineEdit {
-        font-size: 12pt;
+        font-size: 11pt;
         background-color: #385b7d;
         border-radius: 5px;
         height: 30px;
@@ -29,7 +29,7 @@ def dropDownMenu():
         margin: 12px;
     }
     QComboBox {
-        font-size: 12pt;
+        font-size: 11pt;
         background-color: #385b7d;
         border-radius: 5px;
         height: 30px;
@@ -42,7 +42,7 @@ def dropDownMenu():
         border-radius: 5px;
         height: 30px;
         background-color: #385b7d;
-        font-size: 12pt;
+        font-size: 11pt;
     }
     """
 

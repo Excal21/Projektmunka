@@ -51,6 +51,7 @@ class Recognition:
       self.__commands = {}
       self.__camerafeed = True
       self.__framecount = 5
+      self.__error = False
 
   @property
   def framecount(self):
@@ -99,6 +100,13 @@ class Recognition:
   @camerafeed.setter
   def camerafeed(self, value):
     self.__camerafeed = value
+
+  @property
+  def error(self):
+    return self.__error
+  @error.setter
+  def error(self, value):
+    self.__error = value
 
   def __extract_labels(self, path):
     # A kibontási könyvtár neve
@@ -181,7 +189,14 @@ class Recognition:
       "Fényerő növelése": lambda: print("fényerő növelése"),
       "Fényerő csökkentése": lambda: print("fényerő csökkentése"),
       "Jobbra": lambda: pyautogui.press('right'),
-      "Balra": lambda: pyautogui.press('left')
+      "Balra": lambda: pyautogui.press('left'),
+      "Asztal megjelenítése": lambda: pyautogui.hotkey('win', 'd'),
+      "Számológép indítása": lambda: os.system("calc"),
+      "Lejátszás/ megállítás": lambda: pyautogui.press('playpause'),
+      "Következő": lambda: pyautogui.press('nexttrack'),
+      "Előző": lambda: pyautogui.press('prevtrack'),
+      "Hangerő növelése": lambda: pyautogui.press('volumeup'),
+      "Hangerő csökkentése": lambda: pyautogui.press('volumedown')
     }
     if command in what_to_do:
       what_to_do[command]()
@@ -223,12 +238,25 @@ class Recognition:
 
   def Run(self):
     self.__stop = False
-    cap = cv2.VideoCapture(self.__camera)
+    cap = cv2.VideoCapture()  # Próbálj meg csatlakozni a megadott IP-címhez
+    cap.setExceptionMode(True)
+
+    try:
+      if type(self.__camera) == int:
+        cap.open(self.__camera)
+      else:
+        cap.open(self.__camera,  apiPreference=cv2.CAP_FFMPEG,
+        params=[cv2.CAP_PROP_OPEN_TIMEOUT_MSEC, 500])
+    except:
+      self.__error = True
+    
+
     last_gestures = []
     last_gesture_time = datetime.now()
 
 
-    while not self.__stop: 
+
+    while not self.__stop and not self.__error: 
       #Beépített kamera
       ret, img = cap.read()
       img = cv2.flip(img, 1)
@@ -267,6 +295,7 @@ class Recognition:
         cv2.imshow('Annotated Image', annotated_image)
 
     cv2.destroyAllWindows() 
+
   def Stop(self):
     self.__stop = True
 

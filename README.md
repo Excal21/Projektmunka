@@ -9,6 +9,8 @@ A felhasználó kezének felismerése és értelmezése a Google MediaPipe API s
     
 Bővebb információ: [Google MediaPipe API](https://ai.google.dev/edge/mediapipe/solutions/vision/gesture_recognizer)
 
+Ikon: [Flaticon by Vitaly Gorbachev](https://www.flaticon.com/free-icons/hello)
+
 ## Csapattagok
 - Barszcz Dániel
 - Varga Balázs
