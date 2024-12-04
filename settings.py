@@ -14,6 +14,7 @@ class Ui_settingsWindow(QtCore.QObject):
     def setupUi(self, settingsWindow):
         settingsWindow.setObjectName("settingsWindow")
         settingsWindow.resize(900, 700)
+
         settingsWindow.setStyleSheet(style.mainWindowStyle())
 
         # Central widget
@@ -22,9 +23,9 @@ class Ui_settingsWindow(QtCore.QObject):
 
         # Horizontal Layout Widget for Label and Button
         self.horizontalLayoutWidget = QtWidgets.QWidget(parent=self.centralwidget)
-        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(30, 10, 731, 80))
+        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(30, 10, 840, 80))
         self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
-
+        self.horizontalLayoutWidget.setStyleSheet("margin-right: auto;margin-left: auto;")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -32,6 +33,7 @@ class Ui_settingsWindow(QtCore.QObject):
         # Label
         self.label = QtWidgets.QLabel(parent=self.horizontalLayoutWidget)
         self.label.setObjectName("label")
+        self.label.setStyleSheet(style.settingsTitle())
         self.horizontalLayout.addWidget(self.label, 0, QtCore.Qt.AlignmentFlag.AlignHCenter)
         # Main content layout
         self.mainContentWidget = QtWidgets.QWidget(self.centralwidget)
@@ -237,6 +239,7 @@ class Ui_settingsWindow(QtCore.QObject):
         message.setWindowTitle("Sikeres mentés")
         message.setText("A beállítások sikeresen elmentve!")
         message.setIcon(QtWidgets.QMessageBox.Icon.Information)
+        message.setStyleSheet(style.messageBox())       
         message.exec()
         
     def getComboBoxChoices(self):
@@ -264,17 +267,19 @@ class Ui_settingsWindow(QtCore.QObject):
         message.setText("Biztosan törölni szeretné a beállításokat?")
         message.setIcon(QtWidgets.QMessageBox.Icon.Question)
         message.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+        message.setStyleSheet(style.messageBox())        
         message.setDefaultButton(QtWidgets.QMessageBox.StandardButton.No)
 
         response = message.exec()
 
         if response == QtWidgets.QMessageBox.StandardButton.Yes:
             with open('preferences.json', 'w', encoding='utf-8') as file:
-                json.dump({}, file, indent=4)
+                file.write("")
             message = QtWidgets.QMessageBox()
             message.setWindowTitle("Sikeres törlés")
             message.setText("A beállítások sikeresen törölve!")
-            message.setIcon(QtWidgets.QMessageBox.Icon.Question)
+            message.setIcon(QtWidgets.QMessageBox.Icon.Information)
+            message.setStyleSheet(style.messageBox())    
             message.exec()
             self.addOptions()
         else:

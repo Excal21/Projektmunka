@@ -1,9 +1,20 @@
-def  button():
-   return "height: 45px;border-radius: 10px; border: none; background-color: #385b7d;"
-
+def button():
+    return """
+    QPushButton {
+        height: 45px;
+        border-radius: 10px;
+        border: none;
+        background-color: #385b7d;
+    }
+    QPushButton:pressed {
+        background-color: #2c3e50;
+    }
+    """
 def  mainWindowStyle():
    return "background-color: #151b23; color: white; font: 20pt \"Bahnschrift\";"
 
+def settingsTitle():
+    return "font: 28px \"Bahnschrift\";"
 def projectDescription():
    return "Az alkalmazás lehetővé teszi a<br>számítógép kézmozdulatokkal<br>történő irányítását"
 
@@ -45,7 +56,26 @@ def dropDownMenu():
         font-size: 11pt;
     }
     """
-
+def messageBox():
+    return """
+    QMessageBox {
+        background-color: #385b7d;
+        color: white;
+        font: 12pt "Bahnschrift";
+        border-radius: 5px;
+    }
+    QMessageBox QLabel {
+        color: white;
+    }
+    QMessageBox QPushButton {
+        background-color: #2c3e50;
+        border-radius: 5px;
+        width: 50px;
+        height: 25px;
+        color: white;
+        font: 12pt "Bahnschrift";
+    }
+    """
 def contacts(): 
     return """
         <p>

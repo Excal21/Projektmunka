@@ -47,6 +47,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
+
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -149,7 +150,6 @@ class Ui_MainWindow(object):
                     recognizer.camerafeed = camFeed
                     recognizer.framecount = frameCount
 
-
                     if self.pushButton.text() == "Használat":
                         x = ThreadWithException(target=recognizer.Run)
                         x.start()
@@ -161,13 +161,12 @@ class Ui_MainWindow(object):
                         self.pushButton.setText("megállítás")  # Change button text to "megállítás"
                         self.pushButton_2.setEnabled(False)  # Disable pushButton_2
                         time.sleep(1)
-                        if(x.is_alive and recognizer.error == True):
+                        if x.is_alive() and recognizer.error:
                             recognizer.Stop()
                             recognizer.error = False
                             self.pushButton.setText("Használat")  # Change button text back to "Használat"
                             self.pushButton_2.setEnabled(True)  # Enable pushButton_2
                             raise ConnectionError
-                        
 
                     else:
                         recognizer.Stop()
@@ -194,6 +193,7 @@ class Ui_MainWindow(object):
         
     def openSettings(self):
         self.settingsWindow.show()
+
 
 
     def retranslateUi(self, MainWindow):
