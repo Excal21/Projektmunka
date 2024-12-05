@@ -1,10 +1,9 @@
 import time
 import threading
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 import sys
 import style
 import json
-import webbrowser
 import gesture_detection as gd
 import settings
 
@@ -13,8 +12,14 @@ usedTaskFile = "gesture_recognizer.task"
 recognizer = gd.Recognition(usedTaskFile)
 global selected_prefs
 selected_prefs = recognizer.labels_with_alias
-if 'None' or ''or'none' in selected_prefs:
+
+try:
     selected_prefs.pop('None')
+    selected_prefs.pop('NONE')
+    selected_prefs.pop('none')
+except KeyError:
+    pass
+
 possible_commands = ["", "Ctrl+C", "Ctrl+V", "Böngésző megnyitása", "Jobbra", "Balra",
                      "Asztal megjelenítése", "Számológép indítása", "Lejátszás/ megállítás", "Következő", "Előző",
                      "Hangerő növelése", "Hangerő csökkentése"]

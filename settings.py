@@ -166,7 +166,7 @@ class Ui_settingsWindow(QtCore.QObject):
         # sensitivity label and input
         self.sensitivityLabel= QtWidgets.QLabel(parent=self.leftWidget)
         self.sensitivityLabel.setObjectName("sensitivityLabel")
-        self.sensitivityLabel.setText("Felismerés minimális érzékenyésge (%)")
+        self.sensitivityLabel.setText("Felismerés minimális érzékenysége (%)")
         self.sensitivityLabel.setStyleSheet(style.mainContentLabel())
         self.leftGrid.addWidget(self.sensitivityLabel, row, 0, 1, 1)
         

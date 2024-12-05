@@ -4,17 +4,12 @@
 
 import os
 import cv2
-import mediapipe as mp
-from time import sleep
-from matplotlib import pyplot as plt
+from mediapipe import solutions, Image, ImageFormat
 from mediapipe.framework.formats import landmark_pb2
-from mediapipe import solutions
-import numpy as np
 from mediapipe.tasks import python
-from mediapipe.tasks.python import vision
+import numpy as np
 from datetime import datetime
 import shutil
-import json
 import pyautogui
 
 
@@ -25,9 +20,9 @@ class Recognition:
       self.FONT_THICKNESS = 1
       self.HANDEDNESS_TEXT_COLOR = (88, 205, 54)  # vibrant green
 
-      self.mp_hands = mp.solutions.hands
-      self.mp_drawing = mp.solutions.drawing_utils
-      self.mp_drawing_styles = mp.solutions.drawing_styles
+      self.mp_hands = solutions.hands
+      self.mp_drawing = solutions.drawing_utils
+      self.mp_drawing_styles = solutions.drawing_styles
 
       #Modelfájl betöltése és beállítása
       self.model_file = open(task_file_path, "rb")
@@ -35,13 +30,13 @@ class Recognition:
       self.model_file.close()
       self.base_options = python.BaseOptions(model_asset_buffer=self.model_data)
 
-      self.options = vision.GestureRecognizerOptions(
+      self.options = python.vision.GestureRecognizerOptions(
           base_options=self.base_options,
           min_tracking_confidence=0.7,
           
           num_hands=4
           )
-      self.recognizer = vision.GestureRecognizer.create_from_options(self.options)
+      self.recognizer = python.vision.GestureRecognizer.create_from_options(self.options)
 
       self.__camera = 0
       self.__labels = self.__extract_labels(task_file_path)
@@ -141,36 +136,38 @@ class Recognition:
 
   def __alias_labels(self, labels):
     readable = {
-        "None": "",
-        "2up": "mutatás felfelé két ujjal",
-        "2down": "mutatás lefelé két ujjal",
-        "2left": "mutatás balra két ujjal",
-        "2right": "mutatás jobbra két ujjal",
-        "drei_glaser": "három",
-        "peace": "csao",
-        "2Metal": "metálvilla",
-        "long_life": "hosszú élet",
-        "fist": "ökölpacsi",
-        "like": "tetszik",
-        "perfect": "tökéletes",
-        "middle_finger": "középső ujj",
-        "fityisz": "fityisz",
-        "F": "F",
-        "CLOSEDPALM" : "Zárt tenyér",
-        "OPENPALM" : "Nyitott tenyér",
-        "THUMBSUP" : "Hüvelykujj fel",
-        "THUMBSDOWN" : "Hüvelykujj le",
-        "PEACE": "Béke",
-        "OK": "OK",
-        "LONGLIVE": "Hosszú élet (STAR TREK)",
-        "Closed_Fist": "Zárt ököl",
-        "Open_Palm": "Nyitott tenyér",
-        "Pointing_Up": "Felfelé mutatás",
-        "Thumb_Down": "Hüvelykujj le",
-        "Thumb_Up": "Hüvelykujj fel",
-        "Victory": "Győzelem jelzés",
-        "ILoveYou": "Szeretlek jelzés",
-
+      "None": "",
+      "2up": "Mutatás Felfelé Két Ujjal",
+      "2down": "Mutatás Lefelé Két Ujjal",
+      "2left": "Mutatás Balra Két Ujjal",
+      "2LEFT": "Mutatás Balra Két Ujjal",
+      "2right": "Mutatás Jobbra Két Ujjal",
+      "2RIGHT": "Mutatás Jobbra Két Ujjal",
+      "drei_glaser": "Három",
+      "peace": "Csao",
+      "2Metal": "Metálvilla",
+      "METAL": "Metálvilla",
+      "long_life": "Hosszú Élet",
+      "fist": "Ökölpacsi",
+      "like": "Tetszik",
+      "perfect": "Tökéletes",
+      "middle_finger": "Középső Ujj",
+      "fityisz": "Fityisz",
+      "F": "F",
+      "CLOSEDPALM": "Zárt Tenyér",
+      "OPENPALM": "Nyitott Tenyér",
+      "THUMBSUP": "Hüvelykujj Fel",
+      "THUMBSDOWN": "Hüvelykujj Le",
+      "PEACE": "Béke",
+      "OK": "OK",
+      "LONGLIVE": "Hosszú Élet (STAR TREK)",
+      "Closed_Fist": "Zárt Ököl",
+      "Open_Palm": "Nyitott Tenyér",
+      "Pointing_Up": "Felfelé Mutatás",
+      "Thumb_Down": "Hüvelykujj Le",
+      "Thumb_Up": "Hüvelykujj Fel",
+      "Victory": "Győzelem Jelzés",
+      "ILoveYou": "Szeretlek Jelzés",
     }
 
     gest_dict = {}
@@ -268,7 +265,7 @@ class Recognition:
       #Kilépés ESC gombra
       if cv2.waitKey(1) == 27: 
           self.__stop = True
-      mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=img)
+      mp_image = Image(image_format=ImageFormat.SRGB, data=img)
 
       result = self.recognizer.recognize(mp_image)
       if len(result.gestures) >= 1:
